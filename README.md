@@ -1,4 +1,4 @@
-# PiongTeX: Mahjong LaTeX Package
+# PongTeX: Mahjong LaTeX Package
 
 This is a LaTeX package for elegantly and efficiently rendering Mahjong tiles. The project has been refactored, with the core implementation organized into a standalone `mahjong.sty` file. This package adopts an extremely compact MPSZ syntax and supports the automated rendering of complex tile arrangements, including red fives (Akadora), rotated tiles for called melds, and closed kans (Ankan).
 
