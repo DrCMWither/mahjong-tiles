@@ -1,17 +1,33 @@
 # PongTeX: Mahjong LaTeX Package
 
-This is a LaTeX package for elegantly and efficiently rendering Mahjong tiles. The project has been refactored, with the core implementation organized into a standalone `mahjong.sty` file. This package adopts an extremely compact MPSZ syntax and supports the automated rendering of complex tile arrangements, including red fives (Akadora), rotated tiles for called melds, and closed kans (Ankan).
+PongTeX is a LaTeX package for typesetting Japanese/Riichi Mahjong tiles with compact MPSZ notation. This package adopts an extremely compact MPSZ syntax and supports the automated rendering of complex tile arrangements, including red fives (Akadora), rotated tiles for called melds, and closed kans (Ankan).
+
 
 ## Installation & Setup
 
-Place the `mahjong.sty` file in your TeX working directory or your local `texmf` tree. Import the package in your document's preamble using `\usepackage`, where you can optionally adjust the tile height:
+Place the `pongtex.sty` file in your TeX working directory or your local `texmf` tree. Import the package in your document's preamble using `\usepackage`, where you can optionally adjust the tile height:
 
 ```tex
-\usepackage[height=1.5\baselineskip]{mahjong}
-
+\usepackage{pongtex}
 ```
 
-> For backward compatibility, `better_mahjong.sty` is retained as a compatibility entry point. Legacy projects can continue to use `\usepackage{better_mahjong}` without modifying their code.
+Supported package keys:
+
+```tex
+\usepackage[
+  height=1.5\baselineskip,
+  scale=0.75,
+  color=blue!70!black,
+  no-aka=1
+
+]{pongtex}
+```
+
+You can also change defaults after loading the package:
+
+```tex
+\pongtexsetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=0}
+```
 
 ## Basic Usage
 
@@ -56,6 +72,7 @@ The back of a tile (`x`) can be recolored with `back-color` either as a package 
 ```
 
 This recoloring uses a clipping mask rather than a blend overlay.  Since `tiles/mahjong-Back.pdf` consists only of a solid red shape and transparent corners, the package clips to the exact original back outline and fills that mask with the requested `xcolor` color.
+
 ## Syntax Guide
 
 This package uses an intuitive "number + letter" input syntax. The specific rules are as follows:
@@ -83,8 +100,6 @@ This package uses an intuitive "number + letter" input syntax. The specific rule
 * **Closed Kan (Ankan) Shortcuts**
 * Typing 5 identical consecutive numbers (e.g., `33333z` or `55555p`) will automatically render using the visual rules for a **closed kan**: "face-down tile + two face-up tiles + face-down tile".
 * For suits containing red fives (e.g., `55555m` / `55555p` / `55555s`), it will automatically render as: "face-down tile + red five + regular five + face-down tile".
-
-
 
 ## Compilation
 

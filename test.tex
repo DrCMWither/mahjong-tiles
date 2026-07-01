@@ -1,8 +1,9 @@
 \documentclass{article}
 \usepackage[
   height=1.5\baselineskip,
-  back-color=blue!70!black
-]{mahjong}
+  scale=0.75,
+  color=blue!70!black
+]{pongtex}
 \usepackage[a4paper,margin=22mm]{geometry}
 \setlength\parindent{0pt}
 \setlength\parskip{10pt}
@@ -17,25 +18,68 @@ Basic hands:
 
 \mahjong{19m19s19p1234567z}
 
-Rotated/open meld marker syntax is preserved:
+Rotated/open meld marker syntax:
 
 \mahjong{111m111s111p22z2-3*333z}
 
-Concealed-kong shorthand is preserved:
+Concealed-kong shorthand:
 
 \mahjong{555m555s22z2-55555p1-33333z}
 
-Original package shorthands are also supported:
+Red fives are enabled by default:
+
+\mahjong{0m0p0s55555m}
+
+Local `no-aka=1` removes red fives while keeping the same notation:
+
+\mahjong[1.5\baselineskip][0.75][blue!70!black][no-aka=1]{0m0p0s55555m}
+
+A compact key-value optional argument is also supported:
+
+\mahjong[no-aka=1]{0m0p0s55555p}
+
+Original shorthand markers:
 
 \mahjong{123m-xx?4p'5p"0s}
 
-Change back colour inline:
+Inline back tile color argument `[height][scale][color]`:
 
-\mahjong[1.5\baselineskip][0.75][red!70!black]{555m555s22z2-55555p1-33333z}
+\mahjong[1.5\baselineskip][0.75][blue!70!black]{x x x}
 
-Expl3 internal command available:\par
+\mahjong[1.5\baselineskip][0.75][teal!65!black]{x x x}
+
+Inline `none` restores the embedded back artwork for one call only:
+
+\mahjong[1.5\baselineskip][0.75][none]{x x x}
+
+The global package color is still active after inline overrides:
+
+\mahjong{x x x}
+
+The global `color` key:
+
+\pongtexsetup{color=purple!70!black}
+\mahjong{x x x}
+
+\pongtexsetup{color=none}
+\mahjong{x x x}
+
+Global `no-aka` can be changed with setup:
+
+\pongtexsetup{no-aka=1}
+\mahjong{0m0p0s55555s}
+
+\pongtexsetup{no-aka=0}
+\mahjong{0m0p0s}
+
+Full local key-value form:
+
+\mahjong[height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=1]{x 0m0p0s}
+
+Expl3 function:
+
 \ExplSyntaxOn
-\mahjong:n {111m456s111p11122z}
+\pongtex:n {111m456s111p11122z}
 \ExplSyntaxOff
 
 \end{document}
