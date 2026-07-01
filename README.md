@@ -79,3 +79,8 @@ pdflatex test.tex
 ```
 
 *(A verified `test.pdf` is included in the project for reference to check the output rendering.)*
+
+## Acknowledgments
+This package is built upon the foundation of the excellent [`mahjong` package](https://ctan.org/pkg/mahjong) developed by Daniel Schmitz and available on CTAN.
+
+We extend our gratitude to the original author. While inheriting the underlying tile drawing logic and basic MPSZ support, `PongTeX` refactors the core implementation to introduce syntactic sugar (such as automated kan rendering, tile stacking, and advanced spacing shortcuts) to significantly reduce the code needed to typeset complex mahjong hands.
