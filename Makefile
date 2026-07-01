@@ -45,7 +45,7 @@ install: unpack doc
 	install -d "$(TEXDIR)/tiles" "$(DOCDIR)" "$(SRCDIR)"
 	install -m 0644 $(PACKAGE).sty "$(TEXDIR)/"
 	install -m 0644 tiles/*.pdf "$(TEXDIR)/tiles/"
-	install -m 0644 README.md LICENSE doc/$(PACKAGE)-doc.pdf doc/$(PACKAGE)-doc.tex doc/$(PACKAGE)-example.tex "$(DOCDIR)/"
+	install -m 0644 README.md LICENCE doc/$(PACKAGE)-doc.pdf doc/$(PACKAGE)-doc.tex doc/$(PACKAGE)-example.tex "$(DOCDIR)/"
 	install -m 0644 $(PACKAGE).dtx $(PACKAGE).ins Makefile "$(SRCDIR)/"
 	@command -v mktexlsr >/dev/null 2>&1 && mktexlsr "$(TEXMFHOME)" || true
 
