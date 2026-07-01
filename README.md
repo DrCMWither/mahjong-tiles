@@ -119,4 +119,4 @@ This package is built upon the foundation of the excellent [`mahjong` package](h
 We extend our gratitude to the original author. While inheriting the underlying tile drawing logic and basic MPSZ support, `PongTeX` refactors the core implementation to introduce syntactic sugar (such as automated kan rendering, tile stacking, and advanced spacing shortcuts) to significantly reduce the code needed to typeset complex mahjong hands.
 
 The mahjong tiles used in this package were created by [@FluffyStuff](https://github.com/FluffyStuff).
-The original repository is [FluffyStuff/riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles), used under CC-BY.
+The original repository is [FluffyStuff/riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles), used under public domain/CC.

@@ -1,0 +1,244 @@
+\documentclass{article}
+
+\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\hypersetup{
+  pdftitle={The pongtex Package},
+  pdfauthor={Lilia Chen May Wither},
+  pdfsubject={Typesetting Riichi Mahjong hands and discard rivers},
+  pdfkeywords={LaTeX, Mahjong, Riichi, MPSZ, CTAN}
+}
+\usepackage{pongtex}
+
+\setlength\parindent{0pt}
+\setlength\parskip{6pt}
+\newcommand\pkg[1]{\textsf{#1}}
+\newcommand\cmd[1]{\texttt{\string#1}}
+\newcommand\meta[1]{\ensuremath{\langle}\textit{#1}\ensuremath{\rangle}}
+\newcommand\code[1]{\texttt{\detokenize{#1}}}
+
+\title{The \pkg{pongtex} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
+\author{Lilia Chen May Wither}
+\date{Version 1.7.0, 2026-07-01}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\pkg{pongtex} typesets Japanese/Riichi Mahjong tiles from compact MPSZ notation.
+It provides a document command, \cmd{\mahjong}, for hands and melds, and
+\cmd{\mahjongriver} for discard rivers.  It supports red fives, face-down and
+blank tiles, rotated and stacked tiles, concealed-kong shorthand, local and
+global size options, and recolouring of tile backs.
+\end{abstract}
+
+\section{Loading the package}
+
+A minimal document looks like this.
+
+
+
+If you are working from the CTAN source archive, generate the runtime package file first:
+
+\begin{verbatim}
+latex pongtex.ins
+\end{verbatim}
+
+The distributed user manual lives in \texttt{doc/pongtex-doc.pdf}; its source is
+\texttt{doc/pongtex-doc.tex}.  The package implementation source is
+\texttt{pongtex.dtx}, and \texttt{pongtex.ins} extracts \texttt{pongtex.sty}.
+
+\begin{verbatim}
+\documentclass{article}
+\usepackage{pongtex}
+\begin{document}
+\mahjong{111m456s111p11122z}
+\end{document}
+\end{verbatim}
+
+The package expects the PDF artwork in the \texttt{tiles/} directory.  With the
+default setting, \texttt{pongtex.sty} and \texttt{tiles/} should be installed in
+the same TeX-searchable package directory.
+
+\section{Package options}
+
+Options can be supplied when loading the package or changed later with
+\cmd{\pongtexsetup}.
+
+\begin{verbatim}
+\usepackage[
+  height=1.5\baselineskip,
+  scale=0.75,
+  color=blue!70!black,
+  no-aka=0
+]{pongtex}
+
+\pongtexsetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black}
+\end{verbatim}
+
+\begin{longtable}{@{}p{0.25\linewidth}p{0.22\linewidth}p{0.45\linewidth}@{}}
+\toprule
+Option & Default & Description \\
+\midrule
+\texttt{height} & \verb|\baselineskip| & Height of one upright tile. \\
+\texttt{scale} & \texttt{0.75} & Scale factor for the tile symbol relative to the tile face. \\
+\texttt{tile-dir} & \texttt{tiles} & Directory containing the tile PDF files. \\
+\texttt{color} & \texttt{none} & Recolour the tile back.  Use any \pkg{xcolor} colour expression, or \texttt{none} for the embedded artwork. \\
+\texttt{no-aka} & \texttt{0} & Replace red fives \texttt{0m}, \texttt{0p}, and \texttt{0s} with regular fives when set to \texttt{1}. \\
+\texttt{river-cols} & \texttt{6} & Number of tiles per discard-river row. \\
+\texttt{river-row-gap} & \texttt{0pt} & Vertical gap between discard-river rows. \\
+\bottomrule
+\end{longtable}
+
+\section{The \cmd{\mahjong} command}
+
+\begin{verbatim}
+\mahjong{<tiles>}
+\mahjong[<height>][<scale>][<back-colour>][<local-keys>]{<tiles>}
+\mahjong[<local-keys>]{<tiles>}
+\end{verbatim}
+
+The first optional argument also accepts a key-value list.  This allows compact
+local overrides such as:
+
+\begin{verbatim}
+\mahjong[height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=1]{x 0m0p0s}
+\end{verbatim}
+
+\section{MPSZ notation}
+
+A tile is written as one or more digits followed by a suit letter.  The suits are
+\texttt{m} for manzu, \texttt{p} for pinzu, \texttt{s} for souzu, and \texttt{z}
+for honors.
+
+\begin{longtable}{@{}p{0.32\linewidth}p{0.58\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{111m456s111p11122z} & \mahjong{111m456s111p11122z} \\
+\code{1112345678999p} & \mahjong{1112345678999p} \\
+\code{19m19s19p1234567z} & \mahjong{19m19s19p1234567z} \\
+\bottomrule
+\end{longtable}
+
+\subsection{Special tokens}
+
+\begin{longtable}{@{}p{0.18\linewidth}p{0.72\linewidth}@{}}
+\toprule
+Token & Meaning \\
+\midrule
+\texttt{0m}, \texttt{0p}, \texttt{0s} & Red fives: \mahjong{0m0p0s} \\
+\texttt{x} & Face-down tile: \mahjong{x} \\
+\texttt{?} & Unknown blank tile: \mahjong{?} \\
+\texttt{-} & Full visual gap between groups. \\
+\texttt{N-} & Proportional gap of \texttt{N/7} of one tile width, for example \texttt{2-}. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Rotated and stacked tiles}
+
+The marker \texttt{*} or an apostrophe rotates the preceding tile sideways.  The
+marker \texttt{+} or a double quote stacks two sideways copies of the preceding
+tile, which is useful for kan notation.
+
+\begin{longtable}{@{}p{0.36\linewidth}p{0.54\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{111m111s111p22z2-3*333z} & \mahjong{111m111s111p22z2-3*333z} \\
+\code{123m-xx?4p'5p"0s} & \mahjong{123m-xx?4p'5p"0s} \\
+\bottomrule
+\end{longtable}
+
+\subsection{Red fives and the \texttt{no-aka} option}
+
+Red fives are enabled by default.
+
+\begin{longtable}{@{}p{0.36\linewidth}p{0.54\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{0m0p0s55555m} & \mahjong{0m0p0s55555m} \\
+\code{\mahjong[no-aka=1]{0m0p0s55555p}} & \mahjong[no-aka=1]{0m0p0s55555p} \\
+\bottomrule
+\end{longtable}
+
+\subsection{Concealed kongs}
+
+Five identical consecutive digits followed by a suit are rendered as a concealed
+kan: a face-down tile, two visible tiles, and a face-down tile.  For suited fives,
+the visible pair contains a red five and a regular five unless \texttt{no-aka=1}
+is active.
+
+\begin{longtable}{@{}p{0.36\linewidth}p{0.54\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{55555p} & \mahjong{55555p} \\
+\code{33333z} & \mahjong{33333z} \\
+\code{\mahjong[no-aka=1]{55555s}} & \mahjong[no-aka=1]{55555s} \\
+\bottomrule
+\end{longtable}
+
+\section{Tile-back recolouring}
+
+The tile-back colour can be set globally or locally.  The colour value is passed
+to \pkg{xcolor}.  The special value \texttt{none} restores the embedded back tile.
+
+\begin{verbatim}
+\pongtexsetup{color=purple!70!black}
+\mahjong{x x x}
+
+\mahjong[color=teal!65!black]{x x x}
+\mahjong[color=none]{x x x}
+\end{verbatim}
+
+\begin{center}
+\pongtexsetup{color=purple!70!black}
+\mahjong{x x x}\quad
+\mahjong[color=teal!65!black]{x x x}\quad
+\mahjong[color=none]{x x x}
+\end{center}
+\pongtexsetup{color=none}
+
+\section{Discard rivers}
+
+The \cmd{\mahjongriver} command uses the same notation as \cmd{\mahjong}, but it
+breaks tiles into rows.  The row length is controlled by \texttt{river-cols}.
+
+\begin{verbatim}
+\mahjongriver{1m9m2z5z3s6s1s1m8p4z87m}
+\mahjongriver[river-cols=6]{1m9m2z5z3s6s1s*1m8p4z87m}
+\end{verbatim}
+
+\begin{center}
+\mahjongriver{1m9m2z5z3s6s1s1m8p4z87m}
+
+\mahjongriver[river-cols=6]{1m9m2z5z3s6s1s*1m8p4z87m}
+\end{center}
+
+\section{Expl3 interface}
+
+For package authors who prefer an expl3-style interface, PongTeX also exposes:
+
+\begin{verbatim}
+\ExplSyntaxOn
+\pongtex:n      {111m456s111p11122z}
+\pongtexriver:n {1m2m3m4m5m6m7m8m9m}
+\ExplSyntaxOff
+\end{verbatim}
+
+\section{Attribution and license}
+
+The LaTeX package code is distributed under the MIT License.  Portions are based
+on Daniel Schmitz's \pkg{mahjong} package, copyright 2021 Daniel Schmitz, also
+under the MIT License.
+
+The tile artwork in \texttt{tiles/} is derived from FluffyStuff's
+\texttt{riichi-mahjong-tiles} project.  The upstream license file places that
+work in the public domain/CC0.  Attribution is retained here and in the README.
+
+\end{document}

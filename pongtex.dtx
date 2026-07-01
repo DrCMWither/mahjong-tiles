@@ -1,10 +1,89 @@
+% \iffalse meta-comment
+%
+% pongtex.dtx -- documented source for PongTeX
+%
+% Copyright (c) 2021 Daniel Schmitz
+% Copyright (c) 2026 Lilia Chen May wither
+%
+% This file is distributed under the MIT License; see LICENSE.
+%
+%<*driver>
+\ProvidesFile{pongtex.dtx}[2026/07/01 v2.0.0 PongTeX documented source]
+\documentclass{ltxdoc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+  pdftitle={PongTeX documented source},
+  pdfauthor={Lilia Chen May wither},
+  pdfsubject={Typesetting Riichi Mahjong hands and discard rivers},
+  pdfkeywords={LaTeX, Mahjong, Riichi, MPSZ, CTAN}
+}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{pongtex.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \GetFileInfo{pongtex.dtx}
+%
+% \title{The \textsf{pongtex} Package: Documented Source}
+% \author{Lilia Chen May wither}
+% \date{Version 2.0.0, 2026-07-01}
+% \maketitle
+%
+% \begin{abstract}
+% \textsf{pongtex} typesets Japanese/Riichi Mahjong hands and discard rivers
+% from compact MPSZ notation.  The user-facing manual is distributed as
+% \texttt{doc/pongtex-doc.pdf}; this file is the docstrip source used to
+% generate \texttt{pongtex.sty}.
+% \end{abstract}
+%
+% \section{Installation source}
+%
+% Run \texttt{latex pongtex.ins} to extract \texttt{pongtex.sty} from this
+% file.  The extracted style file must be installed together with the
+% \texttt{tiles/} directory, because the package reads the PDF tile artwork at
+% runtime.
+%
+% \section{License and attribution}
+%
+% The LaTeX package code is distributed under the MIT License.  Portions are
+% based on Daniel Schmitz's \textsf{mahjong} package, copyright 2021 Daniel
+% Schmitz, also under the MIT License.
+%
+% The tile artwork in \texttt{tiles/} is derived from FluffyStuff's
+% \texttt{riichi-mahjong-tiles} project.  The upstream license file places that
+% work in the public domain/CC0.  Attribution is retained in \texttt{README.md}
+% and \texttt{LICENSE}.
+%
+% \StopEventually{\PrintChanges\PrintIndex}
+%
+% \section{Implementation}
+%
+% The following code is extracted by docstrip with the \texttt{package} guard.
+%
+%    \begin{macrocode}
+%<*package>
 %% pongtex.sty -- Typeset Japanese/Riichi Mahjong tiles from compact MPSZ notation.
+%%
+%% This package is derived from and extends Daniel Schmitz's mahjong package.
+%% Copyright (c) 2021 Daniel Schmitz.
+%% PongTeX modifications are copyright (c) 2026 Lilia Chen May wither.
+%%
 %% The package and LaTeX3 namespace are pongtex.
 %% The public hand command is \mahjong for compact document markup.
+%% Distributed under the MIT License; see LICENSE.
+%% Tile artwork in tiles/ is credited to FluffyStuff/riichi-mahjong-tiles;
+%% see README.md and LICENSE for details.
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{pongtex}{2026/07/01}{1.7.0}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
+\ProvidesExplPackage{pongtex}{2026/07/01}{2.0.0}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -677,4 +756,9 @@
   }
 
 \ExplSyntaxOff
+%<package>\endinput
+%</package>
+%    \end{macrocode}
+%
+% \Finale
 \endinput

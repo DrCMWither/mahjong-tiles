@@ -1,0 +1,48 @@
+%% pongtex.ins -- docstrip installer for PongTeX
+%%
+%% Copyright (c) 2021 Daniel Schmitz
+%% Copyright (c) 2026 Lilia Chen May wither
+%%
+%% This file is distributed under the MIT License; see LICENSE.
+
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+
+\preamble
+
+This is a generated file.
+
+Project: PongTeX -- Typeset Japanese/Riichi Mahjong hands and discard rivers.
+
+Copyright (c) 2021 Daniel Schmitz
+Copyright (c) 2026 Lilia Chen May wither
+This file was generated from pongtex.dtx by docstrip.
+
+The package code is distributed under the MIT License; see LICENSE for the
+complete license text and tile-artwork attribution.
+
+\endpreamble
+
+\postamble
+
+End of generated file.
+
+\endpostamble
+
+\generate{
+  \file{pongtex.sty}{\from{pongtex.dtx}{package}}
+}
+
+\obeyspaces
+\Msg{************************************************************}
+\Msg{*}
+\Msg{* To finish installation, move pongtex.sty and the tiles/}
+\Msg{* directory to a TeX-searchable directory, for example:}
+\Msg{*   texmf/tex/latex/pongtex/}
+\Msg{*}
+\Msg{* The user manual is doc/pongtex-doc.pdf.}
+\Msg{*}
+\Msg{************************************************************}
+
+\endbatchfile
