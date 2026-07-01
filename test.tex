@@ -30,7 +30,7 @@ Red fives are enabled by default:
 
 \mahjong{0m0p0s55555m}
 
-Local `no-aka=1` removes red fives while keeping the same notation:
+Local \texttt{no-aka=1} removes red fives while keeping the same notation:
 
 \mahjong[1.5\baselineskip][0.75][blue!70!black][no-aka=1]{0m0p0s55555m}
 
@@ -76,10 +76,22 @@ Full local key-value form:
 
 \mahjong[height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=1]{x 0m0p0s}
 
+\mahjongriver{1m9m2z5z3s6s1s1m8p4z87m}
+
+Discard river with a sideways riichi tile:
+
+\mahjongriver[river-cols=6]{1m9m2z5z3s6s1s*1m8p4z87m}
+
+Discard river with local color and no-aka:
+
+\mahjongriver[1.5\baselineskip][0.75][teal!65!black][river-cols=5,no-aka=1]{0m1m2m3m4m5m6m7m8m9m}
+
 Expl3 function:
 
 \ExplSyntaxOn
 \pongtex:n {111m456s111p11122z}
+\\
+\pongtexriver:n {1m2m3m4m5m6m7m8m9m}
 \ExplSyntaxOff
 
 \end{document}

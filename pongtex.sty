@@ -4,7 +4,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{pongtex}{2026/07/01}{1.4.1}{Typeset Japanese/Riichi Mahjong hands}
+\ProvidesExplPackage{pongtex}{2026/07/01}{1.7.0}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -49,10 +49,14 @@
 \dim_new:N \g__pongtex_default_height_dim
 \fp_new:N  \g__pongtex_default_scale_fp
 \tl_new:N  \g__pongtex_tile_dir_tl
+\int_new:N \g__pongtex_river_cols_int
+\dim_new:N \g__pongtex_river_row_gap_dim
 
 \dim_gset:Nn \g__pongtex_default_height_dim { \baselineskip }
 \fp_gset:Nn  \g__pongtex_default_scale_fp  { 0.75 }
 \tl_gset:Nn  \g__pongtex_tile_dir_tl       { tiles }
+\int_gset:Nn \g__pongtex_river_cols_int    { 6 }
+\dim_gset:Nn \g__pongtex_river_row_gap_dim { 0pt }
 
 \tl_new:N   \g__pongtex_back_color_tl
 \bool_new:N \g__pongtex_back_recolor_bool
@@ -140,6 +144,10 @@
     height   .dim_gset:N = \g__pongtex_default_height_dim,
     scale    .fp_gset:N  = \g__pongtex_default_scale_fp,
     tile-dir .tl_gset:N  = \g__pongtex_tile_dir_tl,
+    river-cols .int_gset:N = \g__pongtex_river_cols_int,
+    river-cols .value_required:n = true,
+    river-row-gap .dim_gset:N = \g__pongtex_river_row_gap_dim,
+    river-row-gap .value_required:n = true,
 
     color .code:n =
       { \__pongtex_set_back_color_global:n {#1} },
@@ -156,6 +164,11 @@
 \dim_new:N \l__pongtex_symbol_height_dim
 \dim_new:N \l__pongtex_baseline_offset_dim
 \fp_new:N  \l__pongtex_tile_scale_fp
+\int_new:N \l__pongtex_river_cols_int
+\dim_new:N \l__pongtex_river_row_gap_dim
+\int_new:N \l__pongtex_river_col_int
+\int_new:N \l__pongtex_river_seen_tiles_int
+\int_new:N \l__pongtex_river_total_tiles_int
 
 \seq_new:N \l__pongtex_tiles_seq
 \seq_new:N \l__pongtex_pending_seq
@@ -172,6 +185,10 @@
   {
     height .dim_set:N = \l__pongtex_tile_height_dim,
     scale  .fp_set:N  = \l__pongtex_tile_scale_fp,
+    river-cols .int_set:N = \l__pongtex_river_cols_int,
+    river-cols .value_required:n = true,
+    river-row-gap .dim_set:N = \l__pongtex_river_row_gap_dim,
+    river-row-gap .value_required:n = true,
 
     color .code:n =
       { \__pongtex_set_back_color_local:n {#1} },
@@ -398,6 +415,61 @@
       { \seq_map_inline:Nn \l__pongtex_tiles_seq { \__pongtex_render_item:nnnn ##1 } }
   }
 
+\cs_new_protected:Npn \__pongtex_render_river:n #1
+  {
+    \dim_set:Nn \l__pongtex_symbol_height_dim
+      { \fp_to_decimal:N \l__pongtex_tile_scale_fp \l__pongtex_tile_height_dim }
+    \dim_set:Nn \l__pongtex_baseline_offset_dim
+      { ( \l__pongtex_tile_height_dim - \l__pongtex_symbol_height_dim ) / 2 }
+    \dim_set:Nn \l__pongtex_tile_width_dim
+      { 0.75 \l__pongtex_tile_height_dim }
+    \__pongtex_parse:n {#1}
+    \int_zero:N \l__pongtex_river_total_tiles_int
+    \seq_map_inline:Nn \l__pongtex_tiles_seq
+      { \__pongtex_count_river_tile:nnnn ##1 }
+    \leavevmode
+    \vtop \bgroup
+      \offinterlineskip
+      \int_zero:N \l__pongtex_river_seen_tiles_int
+      \int_zero:N \l__pongtex_river_col_int
+      \hbox \bgroup
+        \seq_map_inline:Nn \l__pongtex_tiles_seq
+          { \__pongtex_render_river_item:nnnn ##1 }
+      \egroup
+    \egroup
+  }
+
+\cs_new_protected:Npn \__pongtex_count_river_tile:nnnn #1#2#3#4
+  {
+    \str_if_eq:nnF {#1} { gap }
+      { \int_incr:N \l__pongtex_river_total_tiles_int }
+  }
+
+\cs_new_protected:Npn \__pongtex_render_river_item:nnnn #1#2#3#4
+  {
+    \str_if_eq:nnTF {#1} { gap }
+      { \__pongtex_render_gap:n {#2} }
+      {
+        \__pongtex_render_tile:nnn {#2} {#3} {#4}
+        \int_incr:N \l__pongtex_river_seen_tiles_int
+        \int_incr:N \l__pongtex_river_col_int
+        \int_compare:nT { \l__pongtex_river_cols_int > 0 }
+          {
+            \int_compare:nT { \l__pongtex_river_col_int >= \l__pongtex_river_cols_int }
+              {
+                \int_compare:nT
+                  { \l__pongtex_river_seen_tiles_int < \l__pongtex_river_total_tiles_int }
+                  {
+                    \egroup
+                    \vskip \l__pongtex_river_row_gap_dim
+                    \hbox \bgroup
+                    \int_zero:N \l__pongtex_river_col_int
+                  }
+              }
+          }
+      }
+  }
+
 \cs_new_protected:Npn \__pongtex_render_item:nnnn #1#2#3#4
   {
     \str_if_eq:nnTF {#1} { gap }
@@ -538,11 +610,33 @@
 % -----------------------------------------------------------------------------
 % Public commands
 % -----------------------------------------------------------------------------
+\cs_new_protected:Npn \__pongtex_set_local_defaults:
+  {
+    \dim_set_eq:NN \l__pongtex_tile_height_dim \g__pongtex_default_height_dim
+    \fp_set_eq:NN  \l__pongtex_tile_scale_fp  \g__pongtex_default_scale_fp
+    \int_set_eq:NN \l__pongtex_river_cols_int \g__pongtex_river_cols_int
+    \dim_set_eq:NN \l__pongtex_river_row_gap_dim \g__pongtex_river_row_gap_dim
+  }
+
+\cs_new_protected:Npn \__pongtex_apply_local_options:nnnn #1#2#3#4
+  {
+    \__pongtex_set_local_defaults:
+    \tl_if_in:nnTF {#1} { = }
+      { \keys_set:nn { pongtex / local } {#1} }
+      {
+        \dim_set:Nn \l__pongtex_tile_height_dim {#1}
+        \fp_set:Nn  \l__pongtex_tile_scale_fp  {#2}
+        \IfNoValueF {#3}
+          { \__pongtex_set_back_color_local:n {#3} }
+      }
+    \tl_if_blank:nF {#4}
+      { \keys_set:nn { pongtex / local } {#4} }
+  }
+
 \cs_new_protected:Npn \pongtex_typeset_hand:n #1
   {
     \group_begin:
-      \dim_set_eq:NN \l__pongtex_tile_height_dim \g__pongtex_default_height_dim
-      \fp_set_eq:NN  \l__pongtex_tile_scale_fp  \g__pongtex_default_scale_fp
+      \__pongtex_set_local_defaults:
       \__pongtex_render_hand:n {#1}
     \group_end:
   }
@@ -550,24 +644,30 @@
 \cs_new_protected:Npn \pongtex:n #1
   { \pongtex_typeset_hand:n {#1} }
 
+\cs_new_protected:Npn \pongtex_typeset_river:n #1
+  {
+    \group_begin:
+      \__pongtex_set_local_defaults:
+      \__pongtex_render_river:n {#1}
+    \group_end:
+  }
+
+\cs_new_protected:Npn \pongtexriver:n #1
+  { \pongtex_typeset_river:n {#1} }
+
 \NewDocumentCommand \mahjong { O{\g__pongtex_default_height_dim} O{\g__pongtex_default_scale_fp} o O{} m }
   {
     \group_begin:
-      \tl_if_in:nnTF {#1} { = }
-        {
-          \dim_set_eq:NN \l__pongtex_tile_height_dim \g__pongtex_default_height_dim
-          \fp_set_eq:NN  \l__pongtex_tile_scale_fp  \g__pongtex_default_scale_fp
-          \keys_set:nn { pongtex / local } {#1}
-        }
-        {
-          \dim_set:Nn \l__pongtex_tile_height_dim {#1}
-          \fp_set:Nn  \l__pongtex_tile_scale_fp  {#2}
-          \IfNoValueF {#3}
-            { \__pongtex_set_back_color_local:n {#3} }
-        }
-      \tl_if_blank:nF {#4}
-        { \keys_set:nn { pongtex / local } {#4} }
+      \__pongtex_apply_local_options:nnnn {#1} {#2} {#3} {#4}
       \__pongtex_render_hand:n {#5}
+    \group_end:
+  }
+
+\NewDocumentCommand \mahjongriver { O{\g__pongtex_default_height_dim} O{\g__pongtex_default_scale_fp} o O{} m }
+  {
+    \group_begin:
+      \__pongtex_apply_local_options:nnnn {#1} {#2} {#3} {#4}
+      \__pongtex_render_river:n {#5}
     \group_end:
   }
 
