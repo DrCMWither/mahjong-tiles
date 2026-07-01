@@ -58,20 +58,20 @@ For developers accustomed to the LaTeX3 (expl3) programming style, the package a
 
 ## Back Color Replacement
 
-The back of a tile (`x`) can be recolored with `back-color` either as a package option or later through `\mahjongsetup`:
+The back of a tile (`x`) can be recoloured with `color` either as a package option or later through `\pongtexsetup`:
 
 ```tex
-\usepackage[height=1.5\baselineskip,back-color=blue!70!black]{mahjong}
+\usepackage[height=1.5\baselineskip,color=blue!70!black]{mahjong}
 
 % Change it later
-\mahjongsetup{back-color=teal!65!black}
+\pongtexsetup{color=teal!65!black}
 \mahjong{x x x}
 
 % Restore the original embedded back artwork
-\mahjongsetup{back-color=none}
+\pongtexsetup{color=none}
 ```
 
-This recoloring uses a clipping mask rather than a blend overlay.  Since `tiles/mahjong-Back.pdf` consists only of a solid red shape and transparent corners, the package clips to the exact original back outline and fills that mask with the requested `xcolor` color.
+This recolouring uses a clipping mask rather than a blend overlay.  Since `tiles/mahjong-Back.pdf` consists only of a solid red shape and transparent corners, the package clips to the exact original back outline and fills that mask with the requested `xcolor` colour.
 
 ## Syntax Guide
 
