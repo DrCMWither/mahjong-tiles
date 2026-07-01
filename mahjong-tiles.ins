@@ -1,0 +1,48 @@
+%% mahjong-tiles.ins -- docstrip installer for mahjong-tiles
+%%
+%% Copyright (c) 2021 Daniel Schmitz
+%% Copyright (c) 2026 Lilia Chen May wither
+%%
+%% This file is distributed under the MIT Licence; see LICENCE.
+
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+
+\preamble
+
+This is a generated file.
+
+Project: mahjong-tiles -- Typeset Japanese/Riichi Mahjong hands and discard rivers.
+
+Copyright (c) 2021 Daniel Schmitz
+Copyright (c) 2026 Lilia Chen May wither
+This file was generated from mahjong-tiles.dtx by docstrip.
+
+The package code is distributed under the MIT Licence; see LICENCE for the
+complete licence text and tile-artwork attribution.
+
+\endpreamble
+
+\postamble
+
+End of generated file.
+
+\endpostamble
+
+\generate{
+  \file{mahjong-tiles.sty}{\from{mahjong-tiles.dtx}{package}}
+}
+
+\obeyspaces
+\Msg{************************************************************}
+\Msg{*}
+\Msg{* To finish installation, move mahjong-tiles.sty and the tiles/}
+\Msg{* directory to a TeX-searchable directory, for example:}
+\Msg{*   texmf/tex/latex/mahjong-tiles/}
+\Msg{*}
+\Msg{* The user manual is doc/mahjong-tiles-doc.pdf.}
+\Msg{*}
+\Msg{************************************************************}
+
+\endbatchfile

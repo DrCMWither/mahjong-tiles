@@ -6,12 +6,12 @@
 \usepackage{longtable}
 \usepackage{hyperref}
 \hypersetup{
-  pdftitle={The pongtex Package},
+  pdftitle={The mahjong-tiles Package},
   pdfauthor={Lilia Chen May Wither},
   pdfsubject={Typesetting Riichi Mahjong hands and discard rivers},
   pdfkeywords={LaTeX, Mahjong, Riichi, MPSZ, CTAN}
 }
-\usepackage{pongtex}
+\usepackage{mahjong-tiles}
 
 \setlength\parindent{0pt}
 \setlength\parskip{6pt}
@@ -20,7 +20,7 @@
 \newcommand\meta[1]{\ensuremath{\langle}\textit{#1}\ensuremath{\rangle}}
 \newcommand\code[1]{\texttt{\detokenize{#1}}}
 
-\title{The \pkg{pongtex} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
+\title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
 \author{Lilia Chen May Wither}
 \date{Version 2.2.0, 2026-07-01}
 
@@ -28,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-\pkg{pongtex} typesets Japanese/Riichi Mahjong tiles from compact MPSZ notation.
+\pkg{mahjong-tiles} typesets Japanese/Riichi Mahjong tiles from compact MPSZ notation.
 It provides a document command, \cmd{\mahjong}, for hands and melds, and
 \cmd{\mahjongriver} for discard rivers.  It supports red fives, face-down and
 blank tiles, rotated and stacked tiles, concealed-kong shorthand, local and
@@ -44,29 +44,33 @@ A minimal document looks like this.
 If you are working from the CTAN source archive, generate the runtime package file first:
 
 \begin{verbatim}
-latex pongtex.ins
+latex mahjong-tiles.ins
 \end{verbatim}
 
-The distributed user manual lives in \texttt{doc/pongtex-doc.pdf}; its source is
-\texttt{doc/pongtex-doc.tex}.  The package implementation source is
-\texttt{pongtex.dtx}, and \texttt{pongtex.ins} extracts \texttt{pongtex.sty}.
+The distributed user manual lives in \texttt{doc/mahjong-tiles-doc.pdf};
+
+Its source is\texttt{doc/mahjong-tiles-doc.tex};
+
+The package implementation source is \texttt{mahjong-tiles.dtx};
+
+And \texttt{mahjong-tiles.ins} extracts \texttt{mahjong-tiles.sty}.
 
 \begin{verbatim}
 \documentclass{article}
-\usepackage{pongtex}
+\usepackage{mahjong-tiles}
 \begin{document}
 \mahjong{111m456s111p11122z}
 \end{document}
 \end{verbatim}
 
 The package expects the PDF artwork in the \texttt{tiles/} directory.  With the
-default setting, \texttt{pongtex.sty} and \texttt{tiles/} should be installed in
+default setting, \texttt{mahjong-tiles.sty} and \texttt{tiles/} should be installed in
 the same TeX-searchable package directory.
 
 \section{Package options}
 
 Options can be supplied when loading the package or changed later with
-\cmd{\pongtexsetup}.
+\cmd{\mahjongtilessetup}.
 
 \begin{verbatim}
 \usepackage[
@@ -74,9 +78,9 @@ Options can be supplied when loading the package or changed later with
   scale=0.75,
   color=blue!70!black,
   no-aka=0
-]{pongtex}
+]{mahjong-tiles}
 
-\pongtexsetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black}
+\mahjongtilessetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black}
 \end{verbatim}
 
 \begin{longtable}{@{}p{0.25\linewidth}p{0.22\linewidth}p{0.45\linewidth}@{}}
@@ -189,7 +193,7 @@ The tile-back colour can be set globally or locally.  The colour value is passed
 to \pkg{xcolor}.  The special value \texttt{none} restores the embedded back tile.
 
 \begin{verbatim}
-\pongtexsetup{color=purple!70!black}
+\mahjongtilessetup{color=purple!70!black}
 \mahjong{x x x}
 
 \mahjong[color=teal!65!black]{x x x}
@@ -197,12 +201,12 @@ to \pkg{xcolor}.  The special value \texttt{none} restores the embedded back til
 \end{verbatim}
 
 \begin{center}
-\pongtexsetup{color=purple!70!black}
+\mahjongtilessetup{color=purple!70!black}
 \mahjong{x x x}\quad
 \mahjong[color=teal!65!black]{x x x}\quad
 \mahjong[color=none]{x x x}
 \end{center}
-\pongtexsetup{color=none}
+\mahjongtilessetup{color=none}
 
 \section{Discard rivers}
 
@@ -261,20 +265,20 @@ note is moved to the fourth rendered tile, namely the final back tile.
 
 \section{Expl3 interface}
 
-For package authors who prefer an expl3-style interface, PongTeX also exposes:
+For package authors who prefer an expl3-style interface, mahjong-tiles also exposes:
 
 \begin{verbatim}
 \ExplSyntaxOn
-\pongtex_typeset_hand:n {111m456s111p11122z}
-\pongtexriver:n         {111m456s111p11122z}
+\mahjongtiles_typeset_hand:n {111m456s111p11122z}
+\mahjongtilesriver:n         {111m456s111p11122z}
 \ExplSyntaxOff
 \end{verbatim}
 
 \section{Attribution and licence}
 
-The LaTeX package code is distributed under the MIT License.  Portions are based
+The LaTeX package code is distributed under the MIT Licence.  Portions are based
 on Daniel Schmitz's \pkg{mahjong} package, copyright 2021 Daniel Schmitz, also
-under the MIT License.
+under the MIT Licence.
 
 The tile artwork in \texttt{tiles/} is derived from FluffyStuff's
 \texttt{riichi-mahjong-tiles} project.  The upstream licence file places that

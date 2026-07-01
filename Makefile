@@ -1,6 +1,6 @@
-# Makefile for PongTeX
+# Makefile for mahjong-tiles
 
-PACKAGE      = pongtex
+PACKAGE      = mahjong-tiles
 VERSION      = 2.2.0
 LATEX        ?= latex
 PDFLATEX     ?= pdflatex

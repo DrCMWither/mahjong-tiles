@@ -1,14 +1,14 @@
-# PongTeX: Mahjong LaTeX Package
+# mahjong-tiles: Mahjong LaTeX Package
 
-PongTeX is a LaTeX package for typesetting Japanese/Riichi Mahjong tiles with compact MPSZ notation. This package adopts an extremely compact MPSZ syntax and supports the automated rendering of complex tile arrangements, including red fives (Akadora), rotated tiles for called melds, and closed kans (Ankan).
+mahjong-tiles is a LaTeX package for typesetting Japanese/Riichi Mahjong tiles with compact MPSZ notation. This package adopts an extremely compact MPSZ syntax and supports the automated rendering of complex tile arrangements, including red fives (Akadora), rotated tiles for called melds, and closed kans (Ankan).
 
 
 ## Installation & Setup
 
-Place the `pongtex.sty` file in your TeX working directory or your local `texmf` tree. Import the package in your document's preamble using `\usepackage`, where you can optionally adjust the tile height:
+Place the `mahjong-tiles.sty` file in your TeX working directory or your local `texmf` tree. Import the package in your document's preamble using `\usepackage`, where you can optionally adjust the tile height:
 
 ```tex
-\usepackage{pongtex}
+\usepackage{mahjong-tiles}
 ```
 
 Supported package keys:
@@ -20,13 +20,13 @@ Supported package keys:
   color=blue!70!black,
   no-aka=1
 
-]{pongtex}
+]{mahjong-tiles}
 ```
 
 You can also change defaults after loading the package:
 
 ```tex
-\pongtexsetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=0}
+\mahjongtilessetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=0}
 ```
 
 ## Basic Usage
@@ -49,8 +49,8 @@ For developers accustomed to the LaTeX3 (expl3) programming style, the package a
 
 ```tex
 \ExplSyntaxOn
-\pongtex_typeset_hand:n {111m456s111p11122z}
-\pongtex:n              {111m456s111p11122z}
+\mahjongtiles_typeset_hand:n {111m456s111p11122z}
+\mahjongtiles:n              {111m456s111p11122z}
 \ExplSyntaxOff
 
 ```
@@ -58,20 +58,20 @@ For developers accustomed to the LaTeX3 (expl3) programming style, the package a
 
 ## Back Color Replacement
 
-The back of a tile (`x`) can be recoloured with `color` either as a package option or later through `\pongtexsetup`:
+The back of a tile (`x`) can be recoloured with `color` either as a package option or later through `\mahjongtilessetup`:
 
 ```tex
-\usepackage[height=1.5\baselineskip,color=blue!70!black]{pongtex}
+\usepackage[height=1.5\baselineskip,color=blue!70!black]{mahjong-tiles}
 
 % Change it later
-\pongtexsetup{color=teal!65!black}
+\mahjongtilessetup{color=teal!65!black}
 \mahjong{x x x}
 
 % Restore the original embedded back artwork
-\pongtexsetup{color=none}
+\mahjongtilessetup{color=none}
 ```
 
-This recolouring uses a clipping mask rather than a blend overlay.  Since `tiles/pongtex-Back.pdf` consists only of a solid red shape and transparent corners, the package clips to the exact original back outline and fills that mask with the requested `xcolor` colour.
+This recolouring uses a clipping mask rather than a blend overlay.  Since `tiles/mahjong-tiles-Back.pdf` consists only of a solid red shape and transparent corners, the package clips to the exact original back outline and fills that mask with the requested `xcolor` colour.
 
 ## Syntax Guide
 
@@ -106,7 +106,7 @@ This package uses an intuitive "number + letter" input syntax. The specific rule
 This package supports compilation using the standard `pdflatex` engine. To view the test results, you can directly compile the provided test file:
 
 ```bash
-pdflatex pongtex-doc.tex
+make doc
 
 ```
 
@@ -114,7 +114,7 @@ pdflatex pongtex-doc.tex
 
 This package is built upon the foundation of the excellent [`mahjong` package](https://ctan.org/pkg/mahjong) developed by Daniel Schmitz and available on CTAN.
 
-We extend our gratitude to the original author. While inheriting the underlying tile drawing logic and basic MPSZ support, `PongTeX` refactors the core implementation to introduce syntactic sugar (such as automated kan rendering, tile stacking, and advanced spacing shortcuts) to significantly reduce the code needed to typeset complex mahjong hands.
+We extend our gratitude to the original author. While inheriting the underlying tile drawing logic and basic MPSZ support, `mahjong-tiles` refactors the core implementation to introduce syntactic sugar (such as automated kan rendering, tile stacking, and advanced spacing shortcuts) to significantly reduce the code needed to typeset complex mahjong hands.
 
 The mahjong tiles used in this package were created by [@FluffyStuff](https://github.com/FluffyStuff).
 The original repository is [FluffyStuff/riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles), used under public domain/CC.

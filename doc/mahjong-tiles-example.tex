@@ -1,4 +1,4 @@
-% pongtex-example.tex -- example and smoke-test document for PongTeX.
+% mahjong-tiles-example.tex -- example and smoke-test document for mahjong-tiles.
 % Compile from the package root with: make example
 
 \documentclass{article}
@@ -6,7 +6,7 @@
   height=1.5\baselineskip,
   scale=0.75,
   color=blue!70!black
-]{pongtex}
+]{mahjong-tiles}
 \usepackage[a4paper,margin=22mm]{geometry}
 \setlength\parindent{0pt}
 \setlength\parskip{10pt}
@@ -61,18 +61,18 @@ The global package colour is still active after inline overrides:
 
 The global \texttt{color} key:
 
-\pongtexsetup{color=purple!70!black}
+\mahjongtilessetup{color=purple!70!black}
 \mahjong{x x x}
 
-\pongtexsetup{color=none}
+\mahjongtilessetup{color=none}
 \mahjong{x x x}
 
 Global \texttt{no-aka} can be changed with setup:
 
-\pongtexsetup{no-aka=1}
+\mahjongtilessetup{no-aka=1}
 \mahjong{0m0p0s55555s}
 
-\pongtexsetup{no-aka=0}
+\mahjongtilessetup{no-aka=0}
 \mahjong{0m0p0s}
 
 Full local key-value form:
@@ -92,9 +92,9 @@ Discard river with local color and no-aka:
 Expl3 function:
 
 \ExplSyntaxOn
-\pongtex:n {111m456s111p11122z}
+\mahjongtiles:n {111m456s111p11122z}
 \\
-\pongtexriver:n {1m2m3m4m5m6m7m8m9m}
+\mahjongtilesriver:n {1m2m3m4m5m6m7m8m9m}
 \ExplSyntaxOff
 
 \end{document}
