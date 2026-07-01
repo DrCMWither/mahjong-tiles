@@ -5,7 +5,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{mahjong}{2026/07/01}{1.3.0}{Typeset Japanese Mahjong hands}
+\ProvidesExplPackage{mahjong}{2026/07/01}{1.4:.0}{Typeset Japanese Mahjong hands}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -40,6 +40,10 @@
   { Rotation~marker~'#1'~has~no~tile~to~rotate. }
   { Put~the~marker~after~a~digit,~x,~?,~or~a~completed~tile~group. }
 
+\msg_new:nnnn { mahjong } { invalid-bool }
+  { Boolean~option~'#1'~must~be~one~of~true,~false,~1,~0,~yes,~no,~on,~or~off. }
+  { Use~for~example~no-aka=1~to~replace~red~fives~with~regular~fives. }
+
 % -----------------------------------------------------------------------------
 % Package options and state
 % -----------------------------------------------------------------------------
@@ -55,12 +59,14 @@
 \tl_new:N   \g__mahjong_back_filter_tl
 \fp_new:N   \g__mahjong_back_opacity_fp
 \bool_new:N \g__mahjong_back_recolor_bool
+\bool_new:N \g__mahjong_no_aka_bool
 
 \tl_gclear:N \g__mahjong_back_color_tl
 \tl_gset:Nn  \g__mahjong_back_filter_tl { hue }
 \fp_gset:Nn  \g__mahjong_back_opacity_fp { 1 }
 
 \bool_gset_false:N \g__mahjong_back_recolor_bool
+\bool_gset_false:N \g__mahjong_no_aka_bool
 
 \cs_new_protected:Npn \__mahjong_set_back_color_global:n #1
   {
@@ -102,6 +108,38 @@
       }
   }
 
+\cs_new_protected:Npn \__mahjong_set_no_aka_global:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { true }  { \bool_gset_true:N  \g__mahjong_no_aka_bool }
+        { 1 }     { \bool_gset_true:N  \g__mahjong_no_aka_bool }
+        { yes }   { \bool_gset_true:N  \g__mahjong_no_aka_bool }
+        { on }    { \bool_gset_true:N  \g__mahjong_no_aka_bool }
+        { false } { \bool_gset_false:N \g__mahjong_no_aka_bool }
+        { 0 }     { \bool_gset_false:N \g__mahjong_no_aka_bool }
+        { no }    { \bool_gset_false:N \g__mahjong_no_aka_bool }
+        { off }   { \bool_gset_false:N \g__mahjong_no_aka_bool }
+      }
+      { \msg_error:nnn { mahjong } { invalid-bool } { no-aka=#1 } }
+  }
+
+\cs_new_protected:Npn \__mahjong_set_no_aka_local:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { true }  { \bool_set_true:N  \g__mahjong_no_aka_bool }
+        { 1 }     { \bool_set_true:N  \g__mahjong_no_aka_bool }
+        { yes }   { \bool_set_true:N  \g__mahjong_no_aka_bool }
+        { on }    { \bool_set_true:N  \g__mahjong_no_aka_bool }
+        { false } { \bool_set_false:N \g__mahjong_no_aka_bool }
+        { 0 }     { \bool_set_false:N \g__mahjong_no_aka_bool }
+        { no }    { \bool_set_false:N \g__mahjong_no_aka_bool }
+        { off }   { \bool_set_false:N \g__mahjong_no_aka_bool }
+      }
+      { \msg_error:nnn { mahjong } { invalid-bool } { no-aka=#1 } }
+  }
+
 \keys_define:nn { mahjong }
   {
     height   .dim_gset:N = \g__mahjong_default_height_dim,
@@ -115,6 +153,10 @@
     color .code:n =
       { \__mahjong_set_back_color_global:n {#1} },
     color .value_required:n = true,
+
+    no-aka .code:n =
+      { \__mahjong_set_no_aka_global:n {#1} },
+    no-aka .default:n = true,
 
     back-filter .choice:,
     back-filter / hue .code:n =
@@ -149,6 +191,24 @@
 \int_new:N \l__mahjong_tmp_int
 \bool_new:N \l__mahjong_concealed_kong_bool
 
+\keys_define:nn { mahjong / local }
+  {
+    height .dim_set:N = \l__mahjong_tile_height_dim,
+    scale  .fp_set:N  = \l__mahjong_tile_scale_fp,
+
+    back-color .code:n =
+      { \__mahjong_set_back_color_local:n {#1} },
+    back-color .value_required:n = true,
+
+    color .code:n =
+      { \__mahjong_set_back_color_local:n {#1} },
+    color .value_required:n = true,
+
+    no-aka .code:n =
+      { \__mahjong_set_no_aka_local:n {#1} },
+    no-aka .default:n = true,
+  }
+
 % -----------------------------------------------------------------------------
 % Tuple helpers
 % Pending tuple: {face}{orientation}
@@ -162,6 +222,22 @@
 \cs_new_protected:Npn \__mahjong_tile_put:nnn #1#2#3
   { \seq_put_right:Nn \l__mahjong_tiles_seq { { tile } {#1} {#2} {#3} } }
 \cs_generate_variant:Nn \__mahjong_tile_put:nnn { Vnn }
+
+\cs_new_protected:Npn \__mahjong_tile_put_aka_aware:nnn #1#2#3
+  {
+    \bool_if:NTF \g__mahjong_no_aka_bool
+      {
+        \str_if_eq:nnTF {#1} {0}
+          {
+            \tl_if_in:nnTF { mps } {#2}
+              { \__mahjong_tile_put:nnn {5} {#2} {#3} }
+              { \__mahjong_tile_put:nnn {#1} {#2} {#3} }
+          }
+          { \__mahjong_tile_put:nnn {#1} {#2} {#3} }
+      }
+      { \__mahjong_tile_put:nnn {#1} {#2} {#3} }
+  }
+\cs_generate_variant:Nn \__mahjong_tile_put_aka_aware:nnn { Vnn }
 
 \cs_new_protected:Npn \__mahjong_gap_put:n #1
   { \seq_put_right:Nn \l__mahjong_tiles_seq { { gap } {#1} { } { } } }
@@ -277,7 +353,7 @@
   }
 
 \cs_new_protected:Npn \__mahjong_flush_pending_item:nnn #1#2#3
-  { \__mahjong_tile_put:nnn {#1} {#3} {#2} }
+  { \__mahjong_tile_put_aka_aware:nnn {#1} {#3} {#2} }
 
 \cs_new_protected:Npn \__mahjong_detect_concealed_kong:
   {
@@ -307,14 +383,15 @@
   {
     % Five repeated digits followed by a suit are rendered as a concealed kong:
     % back, two visible tiles, back.  For 55555m/p/s the visible pair is red 5
-    % plus normal 5, matching the common red-five notation.
+    % plus normal 5 by default; no-aka=1 turns that visible pair into two
+    % regular fives.
     \__mahjong_tile_put:nnn { x } { } {0}
     \str_if_eq:VnTF \l__mahjong_first_face_tl {5}
       {
         \tl_if_in:nnTF { mps } {#1}
           {
-            \__mahjong_tile_put:nnn {0} {#1} {0}
-            \__mahjong_tile_put:nnn {5} {#1} {0}
+            \__mahjong_tile_put_aka_aware:nnn {0} {#1} {0}
+            \__mahjong_tile_put_aka_aware:nnn {5} {#1} {0}
           }
           {
             \__mahjong_tile_put:nnn {5} {#1} {0}
@@ -322,8 +399,8 @@
           }
       }
       {
-        \__mahjong_tile_put:Vnn \l__mahjong_first_face_tl {#1} {0}
-        \__mahjong_tile_put:Vnn \l__mahjong_first_face_tl {#1} {0}
+        \__mahjong_tile_put_aka_aware:Vnn \l__mahjong_first_face_tl {#1} {0}
+        \__mahjong_tile_put_aka_aware:Vnn \l__mahjong_first_face_tl {#1} {0}
       }
     \__mahjong_tile_put:nnn { x } { } {0}
   }
@@ -507,14 +584,24 @@
 \cs_new_protected:Npn \mahjong_main:n #1
   { \mahjong_typeset_hand:n {#1} }
 
-\NewDocumentCommand \mahjong { O{\g__mahjong_default_height_dim} O{\g__mahjong_default_scale_fp} o m }
+\NewDocumentCommand \mahjong { O{\g__mahjong_default_height_dim} O{\g__mahjong_default_scale_fp} o O{} m }
   {
     \group_begin:
-      \dim_set:Nn \l__mahjong_tile_height_dim {#1}
-      \fp_set:Nn  \l__mahjong_tile_scale_fp  {#2}
-      \IfNoValueF {#3}
-        { \__mahjong_set_back_color_local:n {#3} }
-      \__mahjong_render_hand:n {#4}
+      \tl_if_in:nnTF {#1} { = }
+        {
+          \dim_set_eq:NN \l__mahjong_tile_height_dim \g__mahjong_default_height_dim
+          \fp_set_eq:NN  \l__mahjong_tile_scale_fp  \g__mahjong_default_scale_fp
+          \keys_set:nn { mahjong / local } {#1}
+        }
+        {
+          \dim_set:Nn \l__mahjong_tile_height_dim {#1}
+          \fp_set:Nn  \l__mahjong_tile_scale_fp  {#2}
+          \IfNoValueF {#3}
+            { \__mahjong_set_back_color_local:n {#3} }
+        }
+      \tl_if_blank:nF {#4}
+        { \keys_set:nn { mahjong / local } {#4} }
+      \__mahjong_render_hand:n {#5}
     \group_end:
   }
 
