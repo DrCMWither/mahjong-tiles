@@ -8,7 +8,7 @@
 % This file is distributed under the MIT Licence; see LICENCE.
 %
 %<*driver>
-\ProvidesFile{mahjong-tiles.dtx}[2026/07/02 v2.2.1 mahjong-tiles documented source]
+\ProvidesFile{mahjong-tiles.dtx}[2026/07/02 v2.2.2 mahjong-tiles documented source]
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -33,7 +33,7 @@
 %
 % \title{The \textsf{mahjong-tiles} Package: Documented Source}
 % \author{Lilia Chen May wither}
-% \date{Version 2.2.1, 2026-07-02}
+% \date{Version 2.2.2, 2026-07-02}
 % \maketitle
 %
 % \begin{abstract}
@@ -83,7 +83,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{mahjong-tiles}{2026/07/02}{2.2.1}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
+\ProvidesExplPackage{mahjong-tiles}{2026/07/02}{2.2.2}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -319,6 +319,7 @@
 % Pending tuple: {face}{orientation}{overlay}
 % Output tuple:  {kind}{a}{b}{c}{overlay}
 %   tile = {tile}{face}{suit}{orientation}{overlay}; suit may be empty for x and ?
+%   akastack = {akastack}{suit}{level}{ }{overlay}; red-five edge stack
 %   draw = {draw}{face}{suit}{ }{ }; drawn tile rendered sideways above the hand row
 %   gap  = {gap}{n}{ }{ }{ }; n means n/7 of one tile width
 % -----------------------------------------------------------------------------
@@ -337,22 +338,21 @@
 
 \cs_new_protected:Npn \__mahjongtiles_tile_put_aka_aware:nnnn #1#2#3#4
   {
-    \int_compare:nNnTF { \g__mahjongtiles_aka_int } = {0}
-      {
-        \str_if_eq:nnTF {#1} {0}
-          {
-            \tl_if_in:nnTF { mps } {#2}
-              { \__mahjongtiles_tile_put:nnnn {5} {#2} {#3} {#4} }
-              { \__mahjongtiles_tile_put:nnnn {#1} {#2} {#3} {#4} }
-          }
-          { \__mahjongtiles_tile_put:nnnn {#1} {#2} {#3} {#4} }
-      }
-      { \__mahjongtiles_tile_put:nnnn {#1} {#2} {#3} {#4} }
+    % Keep the source face in the parse tuple.  This lets postfix edge syntax
+    % such as 0p""" force red fives even when aka=0; ordinary rendering still
+    % maps 0m/0p/0s to regular fives when aka=0.
+    \__mahjongtiles_tile_put:nnnn {#1} {#2} {#3} {#4}
   }
 \cs_new_protected:Npn \__mahjongtiles_tile_put_aka_aware:nnn #1#2#3
   { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#2} {#3} { } }
 \cs_generate_variant:Nn \__mahjongtiles_tile_put_aka_aware:nnn { Vnn }
 \cs_generate_variant:Nn \__mahjongtiles_tile_put_aka_aware:nnnn { Vnnn }
+
+\cs_new_protected:Npn \__mahjongtiles_akastack_put:nnn #1#2#3
+  {
+    \seq_put_right:Nn \l__mahjongtiles_tiles_seq { { akastack } {#1} {#2} { } {#3} }
+    \bool_set_false:N \l__mahjongtiles_last_concealed_kong_tail_bool
+  }
 
 \cs_new_protected:Npn \__mahjongtiles_gap_put:n #1
   {
@@ -367,6 +367,29 @@
   }
 \cs_generate_variant:Nn \__mahjongtiles_draw_put:nn { VV }
 
+
+\cs_new_protected:Npn \__mahjongtiles_pending_set_last_stack_marker:n #1
+  {
+    \seq_pop_right:NNTF \l__mahjongtiles_pending_seq \l__mahjongtiles_tmp_tl
+      { \exp_last_unbraced:NV \__mahjongtiles_pending_set_last_stack_marker_aux:nnnn \l__mahjongtiles_tmp_tl {#1} }
+      { \msg_error:nnn { mahjong-tiles } { missing-rotation-target } {#1} }
+  }
+\cs_new_protected:Npn \__mahjongtiles_pending_set_last_stack_marker_aux:nnnn #1#2#3#4
+  {
+    \str_if_eq:nnTF {#1} {0}
+      {
+        \int_case:nnF {#2}
+          {
+            {0} { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {3} {#3} } }
+            {3} { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {4} {#3} } }
+            {4} { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {5} {#3} } }
+            {5} { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {5} {#3} } }
+          }
+          { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {2} {#3} } }
+      }
+      { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {2} {#3} } }
+  }
+
 \cs_new_protected:Npn \__mahjongtiles_pending_set_last_orientation:n #1
   {
     \seq_pop_right:NNTF \l__mahjongtiles_pending_seq \l__mahjongtiles_tmp_tl
@@ -375,6 +398,39 @@
   }
 \cs_new_protected:Npn \__mahjongtiles_pending_set_last_orientation_aux:nnnn #1#2#3#4
   { \seq_put_right:Nn \l__mahjongtiles_pending_seq { {#1} {#4} {#3} } }
+
+
+\cs_new_protected:Npn \__mahjongtiles_output_apply_stack_marker:n #1
+  {
+    \seq_pop_right:NNTF \l__mahjongtiles_tiles_seq \l__mahjongtiles_tmp_tl
+      { \exp_last_unbraced:NV \__mahjongtiles_output_apply_stack_marker_aux:nnnnnn \l__mahjongtiles_tmp_tl {#1} }
+      { \msg_error:nnn { mahjong-tiles } { missing-rotation-target } {#1} }
+  }
+\cs_new_protected:Npn \__mahjongtiles_output_apply_stack_marker_aux:nnnnnn #1#2#3#4#5#6
+  {
+    \str_case:nnF {#1}
+      {
+        { tile }
+          {
+            \str_if_eq:nnTF {#2} {0}
+              {
+                \tl_if_in:nnTF { mps } {#3}
+                  { \__mahjongtiles_akastack_put:nnn {#3} {1} {#5} }
+                  { \seq_put_right:Nn \l__mahjongtiles_tiles_seq { { tile } {#2} {#3} {2} {#5} } }
+              }
+              { \seq_put_right:Nn \l__mahjongtiles_tiles_seq { { tile } {#2} {#3} {2} {#5} } }
+          }
+        { akastack }
+          {
+            \seq_put_right:Nn \l__mahjongtiles_tiles_seq
+              { { akastack } {#2} { \int_min:nn {3} { #3 + 1 } } {#4} {#5} }
+          }
+      }
+      {
+        \seq_put_right:Nn \l__mahjongtiles_tiles_seq { {#1} {#2} {#3} {#4} {#5} }
+        \msg_error:nnn { mahjong-tiles } { missing-rotation-target } {#6}
+      }
+  }
 
 \cs_new_protected:Npn \__mahjongtiles_output_set_last_orientation:n #1
   {
@@ -399,6 +455,13 @@
       { \__mahjongtiles_pending_set_last_orientation:n {#1} }
   }
 
+\cs_new_protected:Npn \__mahjongtiles_set_last_stack_marker:n #1
+  {
+    \seq_if_empty:NTF \l__mahjongtiles_pending_seq
+      { \__mahjongtiles_output_apply_stack_marker:n {#1} }
+      { \__mahjongtiles_pending_set_last_stack_marker:n {#1} }
+  }
+
 \cs_new_protected:Npn \__mahjongtiles_pending_set_last_overlay:n #1
   {
     \seq_pop_right:NNTF \l__mahjongtiles_pending_seq \l__mahjongtiles_tmp_tl
@@ -417,14 +480,21 @@
 \cs_generate_variant:Nn \__mahjongtiles_output_set_last_overlay:n { V }
 \cs_new_protected:Npn \__mahjongtiles_output_set_last_overlay_aux:nnnnnn #1#2#3#4#5#6
   {
-    \str_if_eq:nnTF {#1} { tile }
+    \str_case:nnF {#1}
       {
-        \tl_if_blank:nF {#6}
+        { tile }
           {
-            \bool_if:NT \l__mahjongtiles_last_concealed_kong_tail_bool
-              { \msg_warning:nnn { mahjong-tiles } { concealed-kong-overlay } {#6} }
+            \tl_if_blank:nF {#6}
+              {
+                \bool_if:NT \l__mahjongtiles_last_concealed_kong_tail_bool
+                  { \msg_warning:nnn { mahjong-tiles } { concealed-kong-overlay } {#6} }
+              }
+            \seq_put_right:Nn \l__mahjongtiles_tiles_seq { { tile } {#2} {#3} {#4} {#6} }
           }
-        \seq_put_right:Nn \l__mahjongtiles_tiles_seq { { tile } {#2} {#3} {#4} {#6} }
+        { akastack }
+          {
+            \seq_put_right:Nn \l__mahjongtiles_tiles_seq { { akastack } {#2} {#3} {#4} {#6} }
+          }
       }
       {
         \seq_put_right:Nn \l__mahjongtiles_tiles_seq { {#1} {#2} {#3} {#4} {#5} }
@@ -576,8 +646,8 @@
                 { ? } { \__mahjongtiles_tile_put:nnn { ? } { } {0} }
                 { ' } { \__mahjongtiles_set_last_orientation:n {1} }
                 { * } { \__mahjongtiles_set_last_orientation:n {1} }
-                { " } { \__mahjongtiles_set_last_orientation:n {2} }
-                { + } { \__mahjongtiles_set_last_orientation:n {2} }
+                { " } { \__mahjongtiles_set_last_stack_marker:n { " } }
+                { + } { \__mahjongtiles_set_last_stack_marker:n { + } }
               }
               { \msg_error:nnn { mahjong-tiles } { invalid-token } {#1} }
           }
@@ -614,7 +684,23 @@
   }
 
 \cs_new_protected:Npn \__mahjongtiles_flush_pending_item:nnnn #1#2#3#4
-  { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
+  {
+    \str_if_eq:nnTF {#1} {0}
+      {
+        \tl_if_in:nnTF { mps } {#4}
+          {
+            \int_case:nnF {#2}
+              {
+                {3} { \__mahjongtiles_akastack_put:nnn {#4} {1} {#3} }
+                {4} { \__mahjongtiles_akastack_put:nnn {#4} {2} {#3} }
+                {5} { \__mahjongtiles_akastack_put:nnn {#4} {3} {#3} }
+              }
+              { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
+          }
+          { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
+      }
+      { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
+  }
 
 \cs_new_protected:Npn \__mahjongtiles_detect_concealed_kong:
   {
@@ -759,8 +845,11 @@
     \str_if_eq:nnTF {#1} { gap }
       { \__mahjongtiles_render_gap:n {#2} }
       {
-        \str_if_eq:nnTF {#1} { draw }
-          { \__mahjongtiles_render_draw_tile:nn {#2} {#3} }
+        \str_case:nnF {#1}
+          {
+            { draw }     { \__mahjongtiles_render_draw_tile:nn {#2} {#3} }
+            { akastack } { \__mahjongtiles_render_akastack_with_overlay:nnn {#2} {#3} {#5} }
+          }
           { \__mahjongtiles_render_tile_with_overlay:nnnn {#2} {#3} {#4} {#5} }
         \int_incr:N \l__mahjongtiles_river_seen_tiles_int
         \int_incr:N \l__mahjongtiles_river_col_int
@@ -785,14 +874,66 @@
   {
     \str_case:nnF {#1}
       {
-        { gap }  { \__mahjongtiles_render_gap:n {#2} }
-        { draw } { \__mahjongtiles_render_draw_tile:nn {#2} {#3} }
+        { gap }      { \__mahjongtiles_render_gap:n {#2} }
+        { draw }     { \__mahjongtiles_render_draw_tile:nn {#2} {#3} }
+        { akastack } { \__mahjongtiles_render_akastack_with_overlay:nnn {#2} {#3} {#5} }
       }
       { \__mahjongtiles_render_tile_with_overlay:nnnn {#2} {#3} {#4} {#5} }
   }
 
 \cs_new_protected:Npn \__mahjongtiles_render_gap:n #1
   { \hspace { \dim_eval:n { #1 \l__mahjongtiles_tile_width_dim / 7 } } }
+
+
+\cs_new_protected:Npn \__mahjongtiles_render_akastack_with_overlay:nnn #1#2#3
+  {
+    \tl_if_blank:nTF {#3}
+      { \__mahjongtiles_render_akastack:nn {#1} {#2} }
+      { \__mahjongtiles_make_akastack_overlay_tile:nnn {#1} {#2} {#3} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_akastack:nn #1#2
+  {
+    \int_compare:nNnTF {#2} > {2}
+      { \__mahjongtiles_render_sideways_stack_raw:nnn {0} {#1} {0} }
+      {
+        \int_compare:nNnTF { \g__mahjongtiles_aka_int } = {0}
+          { \__mahjongtiles_render_sideways_stack_raw:nnn {5} {#1} {5} }
+          {
+            \int_compare:nNnTF {#2} = {1}
+              { \__mahjongtiles_render_sideways_stack_raw:nnn {0} {#1} {5} }
+              { \__mahjongtiles_render_sideways_stack_raw:nnn {5} {#1} {0} }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_sideways_stack_raw:nnn #1#2#3
+  {
+    \stackon [0pt]
+      { \__mahjongtiles_render_tile_raw:nnn {#1} {#2} {1} }
+      { \__mahjongtiles_render_tile_raw:nnn {#3} {#2} {1} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_make_akastack_overlay_tile:nnn #1#2#3
+  {
+    \hbox_set:Nn \l__mahjongtiles_tile_box
+      { \__mahjongtiles_render_akastack:nn {#1} {#2} }
+
+    \tikz [ baseline = (base.base), inner~sep = 0pt, outer~sep = 0pt ]
+      {
+        \node [ inner~sep = 0pt, outer~sep = 0pt ] (base)
+          { \box_use:N \l__mahjongtiles_tile_box };
+
+        \exp_args:NV \__mahjongtiles_make_overlay_node:nn
+          \l__mahjongtiles_overlay_style_tl
+          {#3}
+
+        \path [ use~as~bounding~box ]
+          (base.south~west)
+          rectangle
+          (base.north~east |- mahjongtilesoverlay.north);
+      }
+  }
 
 \cs_new_protected:Npn \__mahjongtiles_render_tile_with_overlay:nnnn #1#2#3#4
   {
@@ -847,6 +988,21 @@
   }
 
 \cs_new_protected:Npn \__mahjongtiles_render_tile:nnn #1#2#3
+  {
+    \str_if_eq:nnTF {#1} {0}
+      {
+        \int_compare:nNnTF { \g__mahjongtiles_aka_int } = {0}
+          {
+            \tl_if_in:nnTF { mps } {#2}
+              { \__mahjongtiles_render_tile_raw:nnn {5} {#2} {#3} }
+              { \__mahjongtiles_render_tile_raw:nnn {#1} {#2} {#3} }
+          }
+          { \__mahjongtiles_render_tile_raw:nnn {#1} {#2} {#3} }
+      }
+      { \__mahjongtiles_render_tile_raw:nnn {#1} {#2} {#3} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_tile_raw:nnn #1#2#3
   {
     \str_case:nnF {#1}
       {
@@ -947,7 +1103,7 @@
       .. controls (0,286.68) and (13.3789,300.059) .. (30,300.059)
       -- cycle;
   }
-
+% way more faster than blend mode compute
 \cs_new_protected:Npn \__mahjongtiles_make_back_tile_upright_recolored:
   {
     \tikz

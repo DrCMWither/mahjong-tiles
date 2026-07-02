@@ -1,7 +1,7 @@
 # Makefile for mahjong-tiles
 
 PACKAGE      = mahjong-tiles
-VERSION      = 2.2.0
+VERSION      = 2.2.2
 LATEX        ?= latex
 PDFLATEX     ?= pdflatex
 TEXMFHOME    ?= $(shell kpsewhich -var-value=TEXMFHOME 2>/dev/null || printf '%s' "$$HOME/texmf")

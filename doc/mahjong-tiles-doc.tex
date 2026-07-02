@@ -22,7 +22,7 @@
 
 \title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
 \author{Lilia Chen May Wither}
-\date{Version 2.2.1, 2026-07-02}
+\date{Version 2.2.2, 2026-07-02}
 
 \begin{document}
 \maketitle
@@ -144,9 +144,17 @@ Token & Meaning \\
 
 \subsection{Rotated and stacked tiles}
 
-The marker \texttt{*} or an apostrophe rotates the preceding tile sideways.  The
-marker \texttt{+} or a double quote stacks two sideways copies of the preceding
-tile, which is useful for kan notation.
+The marker \texttt{*} or an apostrophe rotates the preceding tile sideways.  For
+ordinary tiles, the marker \texttt{+} or a double quote stacks two sideways
+copies of the preceding tile, which is useful for kan notation.
+
+There is one red-five edge syntax for upgraded-kan notation.  With \texttt{aka}
+enabled, \texttt{0m"}, \texttt{0p"}, and \texttt{0s"} produce a mixed sideways
+stack with the red five at the bottom and the regular five at the top.  Repeating
+the stack marker twice, as in \texttt{0p""} or \texttt{0p++}, flips the red five
+to the top.  Three markers, \texttt{0p"""} or \texttt{0p+++}, force two red fives
+and deliberately ignore \texttt{aka}.  The same rule applies to \texttt{m},
+\texttt{p}, and \texttt{s}.
 
 \begin{longtable}{@{}p{0.36\linewidth}p{0.54\linewidth}@{}}
 \toprule
@@ -154,6 +162,9 @@ Input & Output \\
 \midrule
 \code{111m111s111p22z2-3*333z} & \mahjong{111m111s111p22z2-3*333z} \\
 \code{123m-xx?4p'5p"0s} & \mahjong{123m-xx?4p'5p"0s} \\
+\code{0p" 0p"" 0p"""} & \mahjong{0p" 0p"" 0p"""} \\
+\code{0p+ 0p++ 0p+++} & \mahjong{0p+ 0p++ 0p+++} \\
+\code{aka=0: 0p" 0p"" 0p"""} & \mahjong[aka=0]{0p" 0p"" 0p"""} \\
 \bottomrule
 \end{longtable}
 
