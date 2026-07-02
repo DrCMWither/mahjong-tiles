@@ -5,10 +5,10 @@
 % Copyright (c) 2021 Daniel Schmitz
 % Copyright (c) 2026 Lilia Chen May wither
 %
-% This file is distributed under the MIT License; see LICENSE.
+% This file is distributed under the MIT Licence; see LICENCE.
 %
 %<*driver>
-\ProvidesFile{mahjong-tiles.dtx}[2026/07/01 v2.2.0 mahjong-tiles documented source]
+\ProvidesFile{mahjong-tiles.dtx}[2026/07/02 v2.2.1 mahjong-tiles documented source]
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -33,7 +33,7 @@
 %
 % \title{The \textsf{mahjong-tiles} Package: Documented Source}
 % \author{Lilia Chen May wither}
-% \date{Version 2.2.0, 2026-07-01}
+% \date{Version 2.2.1, 2026-07-02}
 % \maketitle
 %
 % \begin{abstract}
@@ -50,16 +50,16 @@
 % \texttt{tiles/} directory, because the package reads the PDF tile artwork at
 % runtime.
 %
-% \section{License and attribution}
+% \section{Licence and attribution}
 %
-% The LaTeX package code is distributed under the MIT License.  Portions are
+% The LaTeX package code is distributed under the MIT Licence.  Portions are
 % based on Daniel Schmitz's \textsf{mahjong} package, copyright 2021 Daniel
-% Schmitz, also under the MIT License.
+% Schmitz, also under the MIT Licence.
 %
 % The tile artwork in \texttt{tiles/} is derived from FluffyStuff's
-% \texttt{riichi-mahjong-tiles} project.  The upstream license file places that
+% \texttt{riichi-mahjong-tiles} project.  The upstream Licence file places that
 % work in the public domain/CC0.  Attribution is retained in \texttt{README.md}
-% and \texttt{LICENSE}.
+% and \texttt{LICENCE}.
 %
 % \StopEventually{\PrintChanges\PrintIndex}
 %
@@ -77,13 +77,13 @@
 %%
 %% The package name and file prefix are mahjong-tiles; the LaTeX3 namespace is mahjongtiles.
 %% The public hand command is \mahjong for compact document markup.
-%% Distributed under the MIT License; see LICENSE.
+%% Distributed under the MIT Licence; see LICENCE.
 %% Tile artwork in tiles/ is credited to FluffyStuff/riichi-mahjong-tiles;
-%% see README.md and LICENSE for details.
+%% see README.md and LICENCE for details.
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{mahjong-tiles}{2026/07/01}{2.2.0}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
+\ProvidesExplPackage{mahjong-tiles}{2026/07/02}{2.2.1}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -142,9 +142,9 @@
   { Inline~\mj\{#1\}~did~not~produce~a~plain~tile. }
   { Inline~\mj~inside~\mahjong\{...\}~is~reserved~for~one~drawn~tile. }
 
-\msg_new:nnnn { mahjong-tiles } { invalid-bool }
-  { Boolean~option~'#1'~must~be~one~of~true,~false,~1,~0,~yes,~no,~on,~or~off. }
-  { Use~for~example~no-aka=1~to~replace~red~fives~with~regular~fives. }
+\msg_new:nnnn { mahjong-tiles } { invalid-aka }
+  { Aka~option~'#1'~must~be~one~of~0,~1,~or~2. }
+  { Use~aka=0~for~no~red~fives,~aka=1~for~normal~red~fives,~or~aka=2~for~an~extra~red~5p~in~concealed~kongs. }
 
 % -----------------------------------------------------------------------------
 % Package options and state
@@ -164,7 +164,7 @@
 \tl_new:N   \g__mahjongtiles_back_color_tl
 \tl_new:N   \g__mahjongtiles_overlay_style_tl
 \bool_new:N \g__mahjongtiles_back_recolor_bool
-\bool_new:N \g__mahjongtiles_no_aka_bool
+\int_new:N  \g__mahjongtiles_aka_int
 
 \tl_gclear:N \g__mahjongtiles_back_color_tl
 \tl_gset:Nn \g__mahjongtiles_overlay_style_tl
@@ -178,7 +178,7 @@
   }
 
 \bool_gset_false:N \g__mahjongtiles_back_recolor_bool
-\bool_gset_false:N \g__mahjongtiles_no_aka_bool
+\int_gset:Nn \g__mahjongtiles_aka_int { 1 }
 
 \cs_new_protected:Npn \__mahjongtiles_set_back_color_global:n #1
   {
@@ -220,36 +220,26 @@
       }
   }
 
-\cs_new_protected:Npn \__mahjongtiles_set_no_aka_global:n #1
+\cs_new_protected:Npn \__mahjongtiles_set_aka_global:n #1
   {
     \str_case:nnF {#1}
       {
-        { true }  { \bool_gset_true:N  \g__mahjongtiles_no_aka_bool }
-        { 1 }     { \bool_gset_true:N  \g__mahjongtiles_no_aka_bool }
-        { yes }   { \bool_gset_true:N  \g__mahjongtiles_no_aka_bool }
-        { on }    { \bool_gset_true:N  \g__mahjongtiles_no_aka_bool }
-        { false } { \bool_gset_false:N \g__mahjongtiles_no_aka_bool }
-        { 0 }     { \bool_gset_false:N \g__mahjongtiles_no_aka_bool }
-        { no }    { \bool_gset_false:N \g__mahjongtiles_no_aka_bool }
-        { off }   { \bool_gset_false:N \g__mahjongtiles_no_aka_bool }
+        { 0 } { \int_gset:Nn \g__mahjongtiles_aka_int {0} }
+        { 1 } { \int_gset:Nn \g__mahjongtiles_aka_int {1} }
+        { 2 } { \int_gset:Nn \g__mahjongtiles_aka_int {2} }
       }
-      { \msg_error:nnn { mahjong-tiles } { invalid-bool } { no-aka=#1 } }
+      { \msg_error:nnn { mahjong-tiles } { invalid-aka } { aka=#1 } }
   }
 
-\cs_new_protected:Npn \__mahjongtiles_set_no_aka_local:n #1
+\cs_new_protected:Npn \__mahjongtiles_set_aka_local:n #1
   {
     \str_case:nnF {#1}
       {
-        { true }  { \bool_set_true:N  \g__mahjongtiles_no_aka_bool }
-        { 1 }     { \bool_set_true:N  \g__mahjongtiles_no_aka_bool }
-        { yes }   { \bool_set_true:N  \g__mahjongtiles_no_aka_bool }
-        { on }    { \bool_set_true:N  \g__mahjongtiles_no_aka_bool }
-        { false } { \bool_set_false:N \g__mahjongtiles_no_aka_bool }
-        { 0 }     { \bool_set_false:N \g__mahjongtiles_no_aka_bool }
-        { no }    { \bool_set_false:N \g__mahjongtiles_no_aka_bool }
-        { off }   { \bool_set_false:N \g__mahjongtiles_no_aka_bool }
+        { 0 } { \int_set:Nn \g__mahjongtiles_aka_int {0} }
+        { 1 } { \int_set:Nn \g__mahjongtiles_aka_int {1} }
+        { 2 } { \int_set:Nn \g__mahjongtiles_aka_int {2} }
       }
-      { \msg_error:nnn { mahjong-tiles } { invalid-bool } { no-aka=#1 } }
+      { \msg_error:nnn { mahjong-tiles } { invalid-aka } { aka=#1 } }
   }
 
 \keys_define:nn { mahjong-tiles }
@@ -268,9 +258,9 @@
       { \__mahjongtiles_set_back_color_global:n {#1} },
     color .value_required:n = true,
 
-    no-aka .code:n =
-      { \__mahjongtiles_set_no_aka_global:n {#1} },
-    no-aka .default:n = true,
+    aka .code:n =
+      { \__mahjongtiles_set_aka_global:n {#1} },
+    aka .default:n = 1,
   }
 \ProcessKeysOptions { mahjong-tiles }
 
@@ -319,9 +309,9 @@
       { \__mahjongtiles_set_back_color_local:n {#1} },
     color .value_required:n = true,
 
-    no-aka .code:n =
-      { \__mahjongtiles_set_no_aka_local:n {#1} },
-    no-aka .default:n = true,
+    aka .code:n =
+      { \__mahjongtiles_set_aka_local:n {#1} },
+    aka .default:n = 1,
   }
 
 % -----------------------------------------------------------------------------
@@ -347,7 +337,7 @@
 
 \cs_new_protected:Npn \__mahjongtiles_tile_put_aka_aware:nnnn #1#2#3#4
   {
-    \bool_if:NTF \g__mahjongtiles_no_aka_bool
+    \int_compare:nNnTF { \g__mahjongtiles_aka_int } = {0}
       {
         \str_if_eq:nnTF {#1} {0}
           {
@@ -656,12 +646,39 @@
       { \tl_set:Nn \l__mahjongtiles_tmpb_tl {#3} }
   }
 
+\cs_new_protected:Npn \__mahjongtiles_put_aka_concealed_five_pair:n #1
+  {
+    \int_compare:nNnTF { \g__mahjongtiles_aka_int } = {0}
+      {
+        \__mahjongtiles_tile_put:nnn {5} {#1} {0}
+        \__mahjongtiles_tile_put:nnn {5} {#1} {0}
+      }
+      {
+        \str_if_eq:nnTF {#1} {p}
+          {
+            \int_compare:nNnTF { \g__mahjongtiles_aka_int } = {2}
+              {
+                \__mahjongtiles_tile_put:nnn {0} {p} {0}
+                \__mahjongtiles_tile_put:nnn {0} {p} {0}
+              }
+              {
+                \__mahjongtiles_tile_put:nnn {0} {p} {0}
+                \__mahjongtiles_tile_put:nnn {5} {p} {0}
+              }
+          }
+          {
+            \__mahjongtiles_tile_put:nnn {0} {#1} {0}
+            \__mahjongtiles_tile_put:nnn {5} {#1} {0}
+          }
+      }
+  }
+
 \cs_new_protected:Npn \__mahjongtiles_flush_concealed_kong:n #1
   {
     % Five repeated digits followed by a suit are rendered as a concealed kong:
-    % back, two visible tiles, back.  For 55555m/p/s the visible pair is red 5
-    % plus normal 5 by default; no-aka=1 turns that visible pair into two
-    % regular fives.
+    % back, two visible tiles, back.  The aka setting controls the visible pair
+    % for 55555m/p/s: aka=0 uses two regular fives, aka=1 uses red plus regular,
+    % and aka=2 gives 55555p an extra red 5p.
     \tl_clear:N \l__mahjongtiles_tmpb_tl
     \seq_map_inline:Nn \l__mahjongtiles_pending_seq
       { \__mahjongtiles_remember_pending_overlay:nnn ##1 }
@@ -670,8 +687,7 @@
       {
         \tl_if_in:nnTF { mps } {#1}
           {
-            \__mahjongtiles_tile_put_aka_aware:nnn {0} {#1} {0}
-            \__mahjongtiles_tile_put_aka_aware:nnn {5} {#1} {0}
+            \__mahjongtiles_put_aka_concealed_five_pair:n {#1}
           }
           {
             \__mahjongtiles_tile_put:nnn {5} {#1} {0}

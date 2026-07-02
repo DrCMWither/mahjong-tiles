@@ -22,7 +22,7 @@
 
 \title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
 \author{Lilia Chen May Wither}
-\date{Version 2.2.0, 2026-07-01}
+\date{Version 2.2.1, 2026-07-02}
 
 \begin{document}
 \maketitle
@@ -49,7 +49,7 @@ latex mahjong-tiles.ins
 
 The distributed user manual lives in \texttt{doc/mahjong-tiles-doc.pdf};
 
-Its source is\texttt{doc/mahjong-tiles-doc.tex};
+Its source is \texttt{doc/mahjong-tiles-doc.tex};
 
 The package implementation source is \texttt{mahjong-tiles.dtx};
 
@@ -77,10 +77,10 @@ Options can be supplied when loading the package or changed later with
   height=1.5\baselineskip,
   scale=0.75,
   color=blue!70!black,
-  no-aka=0
+  aka=1
 ]{mahjong-tiles}
 
-\mahjongtilessetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black}
+\mahjongtilessetup{height=1.5\baselineskip,scale=0.75,color=teal!65!black,aka=1}
 \end{verbatim}
 
 \begin{longtable}{@{}p{0.25\linewidth}p{0.22\linewidth}p{0.45\linewidth}@{}}
@@ -91,7 +91,7 @@ Option & Default & Description \\
 \texttt{scale} & \texttt{0.75} & Scale factor for the tile symbol relative to the tile face. \\
 \texttt{tile-dir} & \texttt{tiles} & Directory containing the tile PDF files. \\
 \texttt{color} & \texttt{none} & Recolour the tile back.  Use any \pkg{xcolor} colour expression, or \texttt{none} for the embedded artwork. \\
-\texttt{no-aka} & \texttt{0} & Replace red fives \texttt{0m}, \texttt{0p}, and \texttt{0s} with regular fives when set to \texttt{1}. \\
+\texttt{aka} & \texttt{1} & Red-five mode: \texttt{0} disables red fives and maps \texttt{0m}, \texttt{0p}, and \texttt{0s} to regular fives; \texttt{1} renders them normally; \texttt{2} also makes \texttt{55555p} show an extra red five pin in concealed-kong shorthand. \\
 \texttt{river-cols} & \texttt{6} & Number of tiles per discard-river row. \\
 \texttt{river-row-gap} & \texttt{0pt} & Vertical gap between discard-river rows. \\
 \bottomrule
@@ -109,7 +109,7 @@ The first optional argument also accepts a key-value list.  This allows compact
 local overrides such as:
 
 \begin{verbatim}
-\mahjong[height=1.5\baselineskip,scale=0.75,color=teal!65!black,no-aka=1]{x 0m0p0s}
+\mahjong[height=1.5\baselineskip,scale=0.75,color=teal!65!black,aka=0]{x 0m0p0s}
 \end{verbatim}
 
 \section{MPSZ notation}
@@ -157,16 +157,21 @@ Input & Output \\
 \bottomrule
 \end{longtable}
 
-\subsection{Red fives and the \texttt{no-aka} option}
+\subsection{Red fives and the \texttt{aka} option}
 
-Red fives are enabled by default.
+Red fives are controlled by the integer \texttt{aka} option.  The default
+\texttt{aka=1} renders \texttt{0m}, \texttt{0p}, and \texttt{0s} as red fives.
+Set \texttt{aka=0} to suppress red fives and render those inputs as regular
+fives.  Set \texttt{aka=2} to keep normal red fives and add one more red five
+pin in the \texttt{55555p} concealed-kong shorthand.
 
 \begin{longtable}{@{}p{0.36\linewidth}p{0.54\linewidth}@{}}
 \toprule
 Input & Output \\
 \midrule
 \code{0m0p0s55555m} & \mahjong{0m0p0s55555m} \\
-\code{\mahjong[no-aka=1]{0m0p0s55555p}} & \mahjong[no-aka=1]{0m0p0s55555p} \\
+\code{\mahjong[aka=0]{0m0p0s55555p}} & \mahjong[aka=0]{0m0p0s55555p} \\
+\code{\mahjong[aka=2]{55555p}} & \mahjong[aka=2]{55555p} \\
 \bottomrule
 \end{longtable}
 
@@ -174,8 +179,9 @@ Input & Output \\
 
 Five identical consecutive digits followed by a suit are rendered as a concealed
 kan: a face-down tile, two visible tiles, and a face-down tile.  For suited fives,
-the visible pair contains a red five and a regular five unless \texttt{no-aka=1}
-is active.
+the visible pair is controlled by \texttt{aka}: \texttt{aka=0} gives two regular
+fives, \texttt{aka=1} gives a red five plus a regular five, and \texttt{aka=2}
+gives \texttt{55555p} two red five-pin tiles.
 
 \begin{longtable}{@{}p{0.36\linewidth}p{0.54\linewidth}@{}}
 \toprule
@@ -183,7 +189,8 @@ Input & Output \\
 \midrule
 \code{55555p} & \mahjong{55555p} \\
 \code{33333z} & \mahjong{33333z} \\
-\code{\mahjong[no-aka=1]{55555s}} & \mahjong[no-aka=1]{55555s} \\
+\code{\mahjong[aka=0]{55555s}} & \mahjong[aka=0]{55555s} \\
+\code{\mahjong[aka=2]{55555p}} & \mahjong[aka=2]{55555p} \\
 \bottomrule
 \end{longtable}
 
