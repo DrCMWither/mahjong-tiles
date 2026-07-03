@@ -22,7 +22,7 @@
 
 \title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
 \author{Lilia Chen May Wither}
-\date{Version 2.2.2, 2026-07-02}
+\date{Version 2.4.0, 2026-07-03}
 
 \begin{document}
 \maketitle
@@ -30,9 +30,10 @@
 \begin{abstract}
 \pkg{mahjong-tiles} typesets Japanese/Riichi Mahjong tiles from compact MPSZ notation.
 It provides a document command, \cmd{\mahjong}, for hands and melds, and
-\cmd{\mahjongriver} for discard rivers.  It supports red fives, face-down and
-blank tiles, rotated and stacked tiles, concealed-kong shorthand, local and
-global size options, and recolouring of tile backs.
+\cmd{\mahjongriver} for discard rivers,and \cmd{\stick} for score-stick
+images.  It supports red fives, face-down and blank tiles, rotated and stacked
+tiles, concealed-kong shorthand, local and global size options, and recolouring of
+tile backs.
 \end{abstract}
 
 \section{Loading the package}
@@ -94,6 +95,10 @@ Option & Default & Description \\
 \texttt{aka} & \texttt{1} & Red-five mode: \texttt{0} disables red fives and maps \texttt{0m}, \texttt{0p}, and \texttt{0s} to regular fives; \texttt{1} renders them normally; \texttt{2} also makes \texttt{55555p} show an extra red five pin in concealed-kong shorthand. \\
 \texttt{river-cols} & \texttt{6} & Number of tiles per discard-river row. \\
 \texttt{river-row-gap} & \texttt{0pt} & Vertical gap between discard-river rows. \\
+\texttt{stick-dir} & \texttt{assets/stick} & Directory containing the score-stick PDF files. \\
+\texttt{stick-height} & \verb|\baselineskip| & Height of one upright score-stick image. \\
+\texttt{stick-scale} & \texttt{1} & Scale factor applied to score-stick images. \\
+\texttt{stick-sep} & \texttt{.5em} & Horizontal space between different score-stick groups. \\
 \bottomrule
 \end{longtable}
 
@@ -205,6 +210,16 @@ Input & Output \\
 \bottomrule
 \end{longtable}
 
+For compatibility with older documents, the deprecated option
+\texttt{no-aka} is still accepted.  It is equivalent to \texttt{aka=0} and emits
+a package warning.  New documents should use \texttt{aka=0} directly.
+
+\begin{verbatim}
+\mahjong[aka=0]{0m0p0s}
+% Deprecated:
+\mahjong[no-aka=1]{0m0p0s}
+\end{verbatim}
+
 \section{Tile-back recolouring}
 
 The tile-back colour can be set globally or locally.  The colour value is passed
@@ -242,7 +257,91 @@ breaks tiles into rows.  The row length is controlled by \texttt{river-cols}.
 \mahjongriver[river-cols=6]{1m9m2z5z3s6s1s*1m8p4z87m}
 \end{center}
 
-\section{Overlay Notes}
+\section{Score sticks}
+
+The \cmd{\stick} command typesets Japanese Mahjong score sticks.  The argument
+may be a three-digit shorthand amount, or a manual specification of stick
+counts.
+
+A three-digit input is interpreted as hundreds of points.  For example,
+\texttt{305} represents \texttt{30500} points.  The package decomposes the value
+into an optimal combination of \texttt{10k}, \texttt{5k}, \texttt{1k}, and
+\texttt{100} sticks.
+
+The default artwork directory is \texttt{assets/stick/}.  It should contain
+\texttt{10k.pdf}, \texttt{5k.pdf}, \texttt{1k.pdf}, and \texttt{100.pdf}.
+
+\begin{longtable}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{\stick{305}} & \stick{305} \\
+\code{\stick{089}} & \stick{089} \\
+\code{\stick{250}} & \stick{250} \\
+\bottomrule
+\end{longtable}
+
+For \texttt{305}, the automatic decomposition is:
+
+\begin{verbatim}
+10k \ctimes 3
+100 \ctimes 5
+\end{verbatim}
+
+Manual input is also supported.  The key-value form names each stick type
+explicitly.
+
+\begin{longtable}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{\stick{10k=3,100=5}} & \stick{10k=3,100=5} \\
+\code{\stick{5k=1,1k=2,100=4}} & \stick{5k=1,1k=2,100=4} \\
+\bottomrule
+\end{longtable}
+
+The compact comma-list form gives the counts in the order
+\texttt{10k}, \texttt{5k}, \texttt{1k}, \texttt{100}.
+
+\begin{longtable}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{\stick{3,0,0,5}} & \stick{3,0,0,5} \\
+\code{\stick[manual]{0,1,2,4}} & \stick[manual]{0,1,2,4} \\
+\bottomrule
+\end{longtable}
+
+The command accepts local options.  These options affect only the current
+\cmd{\stick} call.
+
+\begin{longtable}{@{}p{0.42\linewidth}p{0.48\linewidth}@{}}
+\toprule
+Input & Output \\
+\midrule
+\code{\stick[height=1em,scale=.9,sep=1em]{305}} &
+  \stick[height=1em,scale=.9,sep=1em]{305} \\
+\bottomrule
+\end{longtable}
+
+The score-stick defaults can also be changed globally:
+
+\begin{verbatim}
+\mahjongtilessetup{
+  stick-dir=assets/stick,
+  stick-height=1.2em,
+  stick-scale=1,
+  stick-sep=.6em
+}
+\end{verbatim}
+
+If the artwork is installed somewhere else, set \texttt{stick-dir} accordingly:
+
+\begin{verbatim}
+\mahjongtilessetup{stick-dir=/assets/stick}
+\end{verbatim}
+
+\section{Overlay notes}
 
 The \cmd{\mahjong} command supports text annotations.  Use \texttt{[]} in
 \cmd{\mahjong} to attach a note above the previous tile.
@@ -264,10 +363,10 @@ drawn tile.
   \midrule
   \code{111m111s111p2z2-3*333z7-2z[waiting]} &
     \mahjong{111m111s111p2z2-3*333z7-2z[waiting]} \\
-  \code{111m113s111p2z2-3*333z7-2z[discard \mj{3s},\\ waiting \mj{1s2-2z}]} &
-    \mahjong{111m113s111p2z2-3*333z7-2z[discard \mj{3s},\\ waiting \mj{1s2-2z}]} \\
   \code{123m456p789s\mj{2z}11z} &
     \mahjong{123m456p789s\mj{2z}11z} \\
+  \code{111m113s111p2z2-3*333z7-2z[discard \mj{3s},\\ waiting \mj{1s2-2z}]} &
+    \mahjong{111m113s111p2z2-3*333z7-2z[discard \mj{3s},\\ waiting \mj{1s2-2z}]} \\
   \code{33333z[concealed kong]} &
     \mahjong{33333z[concealed kong]} \\
   \bottomrule

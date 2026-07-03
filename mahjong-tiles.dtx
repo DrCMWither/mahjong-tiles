@@ -8,7 +8,7 @@
 % This file is distributed under the MIT Licence; see LICENCE.
 %
 %<*driver>
-\ProvidesFile{mahjong-tiles.dtx}[2026/07/02 v2.2.2 mahjong-tiles documented source]
+\ProvidesFile{mahjong-tiles.dtx}[2026/07/03 v2.4.0 mahjong-tiles documented source]
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -33,12 +33,12 @@
 %
 % \title{The \textsf{mahjong-tiles} Package: Documented Source}
 % \author{Lilia Chen May wither}
-% \date{Version 2.2.2, 2026-07-02}
+% \date{Version 2.3.0, 2026-07-03}
 % \maketitle
 %
 % \begin{abstract}
-% \textsf{mahjong-tiles} typesets Japanese/Riichi Mahjong hands and discard rivers
-% from compact MPSZ notation.  The user-facing manual is distributed as
+% \textsf{mahjong-tiles} typesets Japanese/Riichi Mahjong hands, discard rivers,
+% and score-stick summaries from compact notation.  The user-facing manual is distributed as
 % \texttt{doc/mahjong-tiles-doc.pdf}; this file is the docstrip source used to
 % generate \texttt{mahjong-tiles.sty}.
 % \end{abstract}
@@ -47,7 +47,8 @@
 %
 % Run \texttt{latex mahjong-tiles.ins} to extract \texttt{mahjong-tiles.sty} from this
 % file.  The extracted style file must be installed together with the
-% \texttt{tiles/} directory, because the package reads the PDF tile artwork at
+% \texttt{tiles/} directory and, when using \texttt{\textbackslash stick}, the
+% \texttt{assets/stick/} directory, because the package reads the PDF artwork at
 % runtime.
 %
 % \section{Licence and attribution}
@@ -83,7 +84,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{mahjong-tiles}{2026/07/02}{2.2.2}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
+\ProvidesExplPackage{mahjong-tiles}{2026/07/03}{2.3.0}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -92,6 +93,7 @@
 \definecolor{mahjongtilesbackred}{rgb}{1,0.215576,0.215576}
 \RequirePackage{tikz}
 \RequirePackage{stackengine}
+\providecommand\ctimes{\ensuremath{\times}}
 
 \ExplSyntaxOn
 
@@ -148,11 +150,23 @@
 
 \msg_new:nnnn { mahjong-tiles } { deprecated-no-aka }
   { Option~'#1'~is~deprecated;~use~'#2'~instead. }
-  { The~legacy~no-aka~option~is~accepted~for~compatibility~only. }
+  { The~legacy~no-aka~option~is~accepted~for~backward~compatibility~only. }
 
 \msg_new:nnnn { mahjong-tiles } { invalid-no-aka }
   { No-aka~option~'#1'~must~be~one~of~0,~1,~false,~or~true. }
   { Use~aka=0~instead~of~no-aka=1,~or~aka=1~instead~of~no-aka=0. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-stick-amount }
+  { Stick~amount~'#1'~must~be~a~one-,~two-,~or~three-digit~integer. }
+  { Use~\stick\{305\}~for~30500,~or~use~manual~counts~such~as~\stick\{10k=3,100=5\}. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-stick-manual }
+  { Manual~stick~spec~'#1'~must~contain~four~counts. }
+  { Use~10k,~5k,~1k,~100~order,~for~example~\stick[manual]\{3,0,0,5\},~or~use~key-values~such~as~\stick\{10k=3,100=5\}. }
+
+\msg_new:nnnn { mahjong-tiles } { unknown-stick }
+  { I~cannot~find~stick~artwork~'#1'. }
+  { Check~that~10k.pdf,~5k.pdf,~1k.pdf,~and~100.pdf~exist~under~the~configured~stick-dir. }
 
 % -----------------------------------------------------------------------------
 % Package options and state
@@ -162,12 +176,20 @@
 \tl_new:N  \g__mahjongtiles_tile_dir_tl
 \int_new:N \g__mahjongtiles_river_cols_int
 \dim_new:N \g__mahjongtiles_river_row_gap_dim
+\tl_new:N  \g__mahjongtiles_stick_dir_tl
+\dim_new:N \g__mahjongtiles_stick_height_dim
+\fp_new:N  \g__mahjongtiles_stick_scale_fp
+\dim_new:N \g__mahjongtiles_stick_sep_dim
 
 \dim_gset:Nn \g__mahjongtiles_default_height_dim { \baselineskip }
 \fp_gset:Nn  \g__mahjongtiles_default_scale_fp  { 0.75 }
 \tl_gset:Nn  \g__mahjongtiles_tile_dir_tl       { tiles }
 \int_gset:Nn \g__mahjongtiles_river_cols_int    { 6 }
 \dim_gset:Nn \g__mahjongtiles_river_row_gap_dim { 0pt }
+\tl_gset:Nn  \g__mahjongtiles_stick_dir_tl      { assets/stick }
+\dim_gset:Nn \g__mahjongtiles_stick_height_dim  { \baselineskip }
+\fp_gset:Nn  \g__mahjongtiles_stick_scale_fp   { 1 }
+\dim_gset:Nn \g__mahjongtiles_stick_sep_dim     { .6em }
 
 \tl_new:N   \g__mahjongtiles_back_color_tl
 \tl_new:N   \g__mahjongtiles_overlay_style_tl
@@ -314,6 +336,14 @@
     height   .dim_gset:N = \g__mahjongtiles_default_height_dim,
     scale    .fp_gset:N  = \g__mahjongtiles_default_scale_fp,
     tile-dir .tl_gset:N  = \g__mahjongtiles_tile_dir_tl,
+    stick-dir .tl_gset:N = \g__mahjongtiles_stick_dir_tl,
+    stick-dir .value_required:n = true,
+    stick-height .dim_gset:N = \g__mahjongtiles_stick_height_dim,
+    stick-height .value_required:n = true,
+    stick-scale .fp_gset:N = \g__mahjongtiles_stick_scale_fp,
+    stick-scale .value_required:n = true,
+    stick-sep .dim_gset:N = \g__mahjongtiles_stick_sep_dim,
+    stick-sep .value_required:n = true,
     river-cols .int_gset:N = \g__mahjongtiles_river_cols_int,
     river-cols .value_required:n = true,
     river-row-gap .dim_gset:N = \g__mahjongtiles_river_row_gap_dim,
@@ -353,6 +383,7 @@
 \tl_new:N  \l__mahjongtiles_tmp_tl
 \tl_new:N  \l__mahjongtiles_tmpa_tl
 \tl_new:N  \l__mahjongtiles_tmpb_tl
+\clist_new:N \l__mahjongtiles_tmp_clist
 \tl_new:N  \l__mahjongtiles_first_face_tl
 \tl_new:N  \l__mahjongtiles_file_tl
 \box_new:N \l__mahjongtiles_tile_box
@@ -360,6 +391,20 @@
 \int_new:N \l__mahjongtiles_mj_depth_int
 \bool_new:N \l__mahjongtiles_concealed_kong_bool
 \bool_new:N \l__mahjongtiles_last_concealed_kong_tail_bool
+
+\tl_new:N  \l__mahjongtiles_stick_dir_tl
+\dim_new:N \l__mahjongtiles_stick_height_dim
+\dim_new:N \l__mahjongtiles_stick_draw_height_dim
+\fp_new:N  \l__mahjongtiles_stick_scale_fp
+\dim_new:N \l__mahjongtiles_stick_sep_dim
+\int_new:N \l__mahjongtiles_stick_amount_int
+\int_new:N \l__mahjongtiles_stick_remainder_int
+\int_new:N \l__mahjongtiles_stick_tenk_int
+\int_new:N \l__mahjongtiles_stick_fivek_int
+\int_new:N \l__mahjongtiles_stick_onek_int
+\int_new:N \l__mahjongtiles_stick_hundred_int
+\bool_new:N \l__mahjongtiles_stick_manual_bool
+\bool_new:N \l__mahjongtiles_stick_has_output_bool
 
 \tl_new:N   \g__mahjongtiles_inline_mj_face_tl
 \tl_new:N   \g__mahjongtiles_inline_mj_suit_tl
@@ -387,6 +432,56 @@
     no-aka .code:n =
       { \__mahjongtiles_set_no_aka_local:n {#1} },
     no-aka .default:n = 1,
+  }
+
+\keys_define:nn { mahjong-tiles / stick }
+  {
+    height .dim_set:N = \l__mahjongtiles_stick_height_dim,
+    height .value_required:n = true,
+    scale .fp_set:N = \l__mahjongtiles_stick_scale_fp,
+    scale .value_required:n = true,
+    sep .dim_set:N = \l__mahjongtiles_stick_sep_dim,
+    sep .value_required:n = true,
+    stick-dir .tl_set:N = \l__mahjongtiles_stick_dir_tl,
+    stick-dir .value_required:n = true,
+    dir .tl_set:N = \l__mahjongtiles_stick_dir_tl,
+    dir .value_required:n = true,
+
+    manual .choice:,
+    manual / true .code:n = { \bool_set_true:N \l__mahjongtiles_stick_manual_bool },
+    manual / false .code:n = { \bool_set_false:N \l__mahjongtiles_stick_manual_bool },
+    manual .default:n = true,
+    auto .code:n = { \bool_set_false:N \l__mahjongtiles_stick_manual_bool },
+    auto .default:n = true,
+
+    10k .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_tenk_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+    5k .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_fivek_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+    1k .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_onek_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+    100 .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_hundred_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+
+    10000 .meta:n = { 10k = #1 },
+    5000 .meta:n = { 5k = #1 },
+    1000 .meta:n = { 1k = #1 },
+    ten-thousand .meta:n = { 10k = #1 },
+    five-thousand .meta:n = { 5k = #1 },
+    thousand .meta:n = { 1k = #1 },
+    hundred .meta:n = { 100 = #1 },
   }
 
 % -----------------------------------------------------------------------------
@@ -1204,6 +1299,142 @@
   }
 
 % -----------------------------------------------------------------------------
+% Stick rendering
+% -----------------------------------------------------------------------------
+\cs_new:Npn \__mahjongtiles_stick_file:n #1
+  { \l__mahjongtiles_stick_dir_tl / #1.pdf }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_set_local_defaults:
+  {
+    \tl_set_eq:NN \l__mahjongtiles_stick_dir_tl \g__mahjongtiles_stick_dir_tl
+    \dim_set_eq:NN \l__mahjongtiles_stick_height_dim \g__mahjongtiles_stick_height_dim
+    \fp_set_eq:NN \l__mahjongtiles_stick_scale_fp \g__mahjongtiles_stick_scale_fp
+    \dim_set_eq:NN \l__mahjongtiles_stick_sep_dim \g__mahjongtiles_stick_sep_dim
+    \int_zero:N \l__mahjongtiles_stick_amount_int
+    \int_zero:N \l__mahjongtiles_stick_remainder_int
+    \int_zero:N \l__mahjongtiles_stick_tenk_int
+    \int_zero:N \l__mahjongtiles_stick_fivek_int
+    \int_zero:N \l__mahjongtiles_stick_onek_int
+    \int_zero:N \l__mahjongtiles_stick_hundred_int
+    \bool_set_false:N \l__mahjongtiles_stick_manual_bool
+    \bool_set_false:N \l__mahjongtiles_stick_has_output_bool
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_compute_counts:
+  {
+    \int_set_eq:NN \l__mahjongtiles_stick_remainder_int \l__mahjongtiles_stick_amount_int
+    \int_set:Nn \l__mahjongtiles_stick_tenk_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 10000 } }
+    \int_set:Nn \l__mahjongtiles_stick_remainder_int
+      { \int_mod:nn { \l__mahjongtiles_stick_remainder_int } { 10000 } }
+    \int_set:Nn \l__mahjongtiles_stick_fivek_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 5000 } }
+    \int_set:Nn \l__mahjongtiles_stick_remainder_int
+      { \int_mod:nn { \l__mahjongtiles_stick_remainder_int } { 5000 } }
+    \int_set:Nn \l__mahjongtiles_stick_onek_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 1000 } }
+    \int_set:Nn \l__mahjongtiles_stick_remainder_int
+      { \int_mod:nn { \l__mahjongtiles_stick_remainder_int } { 1000 } }
+    \int_set:Nn \l__mahjongtiles_stick_hundred_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 100 } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_set_auto:n #1
+  {
+    \regex_match:nnTF { \A \s* [0-9] {1,3} \s* \Z } {#1}
+      {
+        \int_set:Nn \l__mahjongtiles_stick_amount_int { (#1) * 100 }
+        \__mahjongtiles_stick_compute_counts:
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-stick-amount } {#1} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_stick_counts:
+  {
+    \dim_set:Nn \l__mahjongtiles_stick_draw_height_dim
+      { \fp_to_decimal:N \l__mahjongtiles_stick_scale_fp \l__mahjongtiles_stick_height_dim }
+    \leavevmode
+    \__mahjongtiles_render_stick_count:nn { 10k } { \l__mahjongtiles_stick_tenk_int }
+    \__mahjongtiles_render_stick_count:nn { 5k } { \l__mahjongtiles_stick_fivek_int }
+    \__mahjongtiles_render_stick_count:nn { 1k } { \l__mahjongtiles_stick_onek_int }
+    \__mahjongtiles_render_stick_count:nn { 100 } { \l__mahjongtiles_stick_hundred_int }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_stick_count:nn #1#2
+  {
+    \int_compare:nNnT {#2} > {0}
+      {
+        \bool_if:NT \l__mahjongtiles_stick_has_output_bool
+          { \hspace { \l__mahjongtiles_stick_sep_dim } }
+        \__mahjongtiles_make_stick:n {#1}
+        \nobreak \, \ctimes \, \int_to_arabic:n {#2}
+        \bool_set_true:N \l__mahjongtiles_stick_has_output_bool
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_make_stick:n #1
+  {
+    \file_if_exist:nTF { \__mahjongtiles_stick_file:n {#1} }
+      {
+        \includegraphics
+          [ height = \l__mahjongtiles_stick_draw_height_dim ]
+          { \__mahjongtiles_stick_file:n {#1} }
+      }
+      { \msg_error:nnn { mahjong-tiles } { unknown-stick } { \__mahjongtiles_stick_file:n {#1} } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_set_manual_clist:n #1
+  {
+    \clist_set:Nn \l__mahjongtiles_tmp_clist {#1}
+    \int_compare:nNnTF { \clist_count:N \l__mahjongtiles_tmp_clist } = {4}
+      {
+        \int_set:Nn \l__mahjongtiles_stick_tenk_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {1} }
+        \int_set:Nn \l__mahjongtiles_stick_fivek_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {2} }
+        \int_set:Nn \l__mahjongtiles_stick_onek_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {3} }
+        \int_set:Nn \l__mahjongtiles_stick_hundred_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {4} }
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-stick-manual } {#1} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_apply_arg:n #1
+  {
+    \tl_if_blank:nF {#1}
+      {
+        \bool_if:NTF \l__mahjongtiles_stick_manual_bool
+          {
+            \tl_if_in:nnTF {#1} { = }
+              { \keys_set:nn { mahjong-tiles / stick } {#1} }
+              { \__mahjongtiles_stick_set_manual_clist:n {#1} }
+          }
+          {
+            \tl_if_in:nnTF {#1} { = }
+              { \keys_set:nn { mahjong-tiles / stick } {#1} }
+              {
+                \tl_if_in:nnTF {#1} { , }
+                  { \__mahjongtiles_stick_set_manual_clist:n {#1} }
+                  { \__mahjongtiles_stick_set_auto:n {#1} }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick:nn #1#2
+  {
+    \group_begin:
+      \__mahjongtiles_stick_set_local_defaults:
+      \tl_if_blank:nF {#1}
+        { \keys_set:nn { mahjong-tiles / stick } {#1} }
+      \__mahjongtiles_stick_apply_arg:n {#2}
+      \__mahjongtiles_render_stick_counts:
+    \group_end:
+  }
+
+% -----------------------------------------------------------------------------
 % Public commands
 % -----------------------------------------------------------------------------
 \cs_new_protected:Npn \__mahjongtiles_set_local_defaults:
@@ -1293,6 +1524,9 @@
       \__mahjongtiles_render_river:n {#5}
     \group_end:
   }
+
+\NewDocumentCommand \stick { O{} m }
+  { \__mahjongtiles_stick:nn {#1} {#2} }
 
 \NewDocumentCommand \mahjongtilessetup { m }
   {
