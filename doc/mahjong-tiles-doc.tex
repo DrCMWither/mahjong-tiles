@@ -97,7 +97,7 @@ Option & Default & Description \\
 \texttt{river-row-gap} & \texttt{0pt} & Vertical gap between discard-river rows. \\
 \texttt{stick-dir} & \texttt{assets/stick} & Directory containing the score-stick PDF files. \\
 \texttt{stick-height} & \verb|\baselineskip| & Height of one upright score-stick image. \\
-\texttt{stick-scale} & \texttt{1} & Scale factor applied to score-stick images. \\
+\texttt{stick-scale} & \texttt{.5} & Scale factor applied to score-stick images. \\
 \texttt{stick-sep} & \texttt{.5em} & Horizontal space between different score-stick groups. \\
 \bottomrule
 \end{longtable}
@@ -319,8 +319,8 @@ The command accepts local options.  These options affect only the current
 \toprule
 Input & Output \\
 \midrule
-\code{\stick[height=1em,scale=.9,sep=1em]{305}} &
-  \stick[height=1em,scale=.9,sep=1em]{305} \\
+\code{\stick[height=2em,scale=1]{305}} &
+  \stick[height=2em,scale=1]{305} \\
 \bottomrule
 \end{longtable}
 
@@ -348,7 +348,7 @@ The \cmd{\mahjong} command supports text annotations.  Use \texttt{[]} in
 
 Annotations may contain ordinary \TeX{} material.  Mahjong tiles inside an
 annotation are rendered only when they are explicitly wrapped in \cmd{\mj}.
-For example, \texttt{[waiting \cmd{\mj}{3m}]} prints the text
+For example, \texttt{[waiting \cmd{\mj}{\{3m\}}]} prints the text
 "waiting" followed by a small mahjong tile in the annotation.  The
 \cmd{\mj} command is parsed only one level deep inside annotations.
 

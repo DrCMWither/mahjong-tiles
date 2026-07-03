@@ -11,3 +11,4 @@
 *.cb2
 .*.lb
 *.fdb_latexmk
+*.sty
