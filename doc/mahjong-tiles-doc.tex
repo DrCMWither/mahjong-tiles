@@ -5,11 +5,12 @@
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{hyperref}
+\usepackage{float}
 \hypersetup{
   pdftitle={The mahjong-tiles Package},
   pdfauthor={Lilia Chen May Wither},
   pdfsubject={Typesetting Riichi Mahjong hands and discard rivers},
-  pdfkeywords={LaTeX, Mahjong, Riichi, MPSZ, CTAN}
+  pdfkeywords={LaTeX, Mahjong, Riichi, MPSZF, CTAN}
 }
 \usepackage{mahjong-tiles}
 
@@ -22,13 +23,13 @@
 
 \title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
 \author{Lilia Chen May Wither}
-\date{Version 2.4.0, 2026-07-03}
+\date{Version 2.5.0, 2026-07-04}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-\pkg{mahjong-tiles} typesets Japanese/Riichi Mahjong tiles from compact MPSZ notation.
+\pkg{mahjong-tiles} typesets Japanese/Riichi Mahjong tiles from compact MPSZF notation.
 It provides a document command, \cmd{\mahjong}, for hands and melds, and
 \cmd{\mahjongriver} for discard rivers,and \cmd{\stick} for score-stick
 images.  It supports red fives, face-down and blank tiles, rotated and stacked
@@ -117,11 +118,26 @@ local overrides such as:
 \mahjong[height=1.5\baselineskip,scale=0.75,color=teal!65!black,aka=0]{x 0m0p0s}
 \end{verbatim}
 
-\section{MPSZ notation}
+\section{MPSZF notation}
 
 A tile is written as one or more digits followed by a suit letter.  The suits are
-\texttt{m} for manzu, \texttt{p} for pinzu, \texttt{s} for souzu, and \texttt{z}
-for honors.
+\texttt{m} for manzu, \texttt{p} for pinzu, \texttt{s} for souzu, \texttt{z}
+for honors, and \texttt{f} for flower tiles.
+\begin{table}[H]S
+  \centering
+  \caption[MPSZF reference]{MPSZF notation reference. Each tile is identified by its column's number and its row's letter.}
+  \label{tab:mpszfref}
+  \begin{tabular}{ccccccccccc}
+     & \textbf{0} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} \\
+     \textbf{s} & \raisebox{-.75\baselineskip}{\mahjong{0s}} & \mahjong{1s} & \mahjong{2s} & \mahjong{3s} & \mahjong{4s} & \mahjong{5s} & \mahjong{6s} & \mahjong{7s} & \mahjong{8s} & \mahjong{9s} \\
+     \textbf{p} & \mahjong{0p} & \mahjong{1p} & \mahjong{2p} & \mahjong{3p} & \mahjong{4p} & \mahjong{5p} & \mahjong{6p} & \mahjong{7p} & \mahjong{8p} & \mahjong{9p} \\
+     \textbf{m} & \mahjong{0m} & \mahjong{1m} & \mahjong{2m} & \mahjong{3m} & \mahjong{4m} & \mahjong{5m} & \mahjong{6m} & \mahjong{7m} & \mahjong{8m} & \mahjong{9m} \\
+     \textbf{z} & & \mahjong{1z} & \mahjong{2z} & \mahjong{3z} & \mahjong{4z} & \mahjong{5z} & \mahjong{6z} & \mahjong{7z} & & \\
+     \textbf{f} & & \mahjong{1f} & \mahjong{2f} & \mahjong{3f} & \mahjong{4f} & \mahjong{5f} & & & &
+  \end{tabular}
+\end{table}
+
+The table below shows some examples of combinations.
 
 \begin{longtable}{@{}p{0.32\linewidth}p{0.58\linewidth}@{}}
 \toprule
@@ -130,6 +146,8 @@ Input & Output \\
 \code{111m456s111p11122z} & \mahjong{111m456s111p11122z} \\
 \code{1112345678999p} & \mahjong{1112345678999p} \\
 \code{19m19s19p1234567z} & \mahjong{19m19s19p1234567z} \\
+\code{1234f} & \mahjong{1234f} \\
+\code{123m55p12f} & \mahjong{123m55p12f} \\
 \bottomrule
 \end{longtable}
 

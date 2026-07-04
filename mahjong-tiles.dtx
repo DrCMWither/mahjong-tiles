@@ -8,7 +8,7 @@
 % This file is distributed under the MIT Licence; see LICENCE.
 %
 %<*driver>
-\ProvidesFile{mahjong-tiles.dtx}[2026/07/03 v2.4.0 mahjong-tiles documented source]
+\ProvidesFile{mahjong-tiles.dtx}[2026/07/04 v2.5.0mahjong-tiles documented source]
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -17,8 +17,8 @@
 \hypersetup{
   pdftitle={mahjong-tiles documented source},
   pdfauthor={Lilia Chen May wither},
-  pdfsubject={Typesetting Riichi Mahjong hands and discard rivers},
-  pdfkeywords={LaTeX, Mahjong, Riichi, MPSZ, CTAN}
+  pdfsubject={Typesetting Riichi Mahjong hands, flower tiles, discard rivers, and score sticks},
+  pdfkeywords={LaTeX, Mahjong, Riichi, MPSZF, flower tiles, CTAN}
 }
 \EnableCrossrefs
 \CodelineIndex
@@ -33,11 +33,11 @@
 %
 % \title{The \textsf{mahjong-tiles} Package: Documented Source}
 % \author{Lilia Chen May wither}
-% \date{Version 2.4.0, 2026-07-03}
+% \date{Version 2.4.0, 2026-07-04}
 % \maketitle
 %
 % \begin{abstract}
-% \textsf{mahjong-tiles} typesets Japanese/Riichi Mahjong hands, discard rivers,
+% \textsf{mahjong-tiles} typesets Japanese/Riichi Mahjong hands, flower tiles, discard rivers,
 % and score-stick summaries from compact notation.  The user-facing manual is distributed as
 % \texttt{doc/mahjong-tiles-doc.pdf}; this file is the docstrip source used to
 % generate \texttt{mahjong-tiles.sty}.
@@ -70,7 +70,7 @@
 %
 %    \begin{macrocode}
 %<*package>
-%% mahjong-tiles.sty -- Typeset Japanese/Riichi Mahjong tiles from compact MPSZ notation.
+%% mahjong-tiles.sty -- Typeset Japanese/Riichi Mahjong tiles from compact MPSZF notation.
 %%
 %% This package is derived from and extends Daniel Schmitz's mahjong package.
 %% Copyright (c) 2021 Daniel Schmitz.
@@ -84,7 +84,7 @@
 
 \NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \RequirePackage{expl3}
-\ProvidesExplPackage{mahjong-tiles}{2026/07/03}{2.4.0}{Typeset Japanese/Riichi Mahjong hands and discard rivers}
+\ProvidesExplPackage{mahjong-tiles}{2026/07/04}{2.4.0}{Typeset Japanese/Riichi Mahjong hands, flower tiles, discard rivers, and score sticks}
 
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
@@ -101,8 +101,8 @@
 % Messages
 % -----------------------------------------------------------------------------
 \msg_new:nnnn { mahjong-tiles } { invalid-token }
-  { Token~'#1'~is~not~valid~in~Mahjong~MPSZ~notation. }
-  { Valid~tokens~are~0--9,~m,~p,~s,~z,~x,~?,~-,~',~",~*,~+,~[text],~\mj\{tile\},~and~spaces. }
+  { Token~'#1'~is~not~valid~in~Mahjong~MPSZF~notation. }
+  { Valid~tokens~are~0--9,~m,~p,~s,~z,~f,~x,~?,~-,~',~",~*,~+,~[text],~\mj\{tile\},~and~spaces. }
 
 \msg_new:nnnn { mahjong-tiles } { unknown-tile }
   { I~cannot~find~tile~'#1'. }
@@ -114,7 +114,11 @@
 
 \msg_new:nnnn { mahjong-tiles } { missing-suit }
   { Tile~digit(s)~'#1'~do~not~have~a~suit. }
-  { Add~m,~p,~s,~or~z~after~the~digit~group,~or~use~N-~for~a~separator. }
+  { Add~m,~p,~s,~z,~or~f~after~the~digit~group,~or~use~N-~for~a~separator. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-flower }
+  { Flower~tile~'#1f'~is~not~supported. }
+  { Flower~tiles~are~1f,~2f,~3f,~and~4f,~read~from~mahjong-tiles-1f.pdf~through~mahjong-tiles-4f.pdf. }
 
 \msg_new:nnnn { mahjong-tiles } { missing-rotation-target }
   { Rotation~marker~'#1'~has~no~tile~to~rotate. }
@@ -188,7 +192,7 @@
 \dim_gset:Nn \g__mahjongtiles_river_row_gap_dim { 0pt }
 \tl_gset:Nn  \g__mahjongtiles_stick_dir_tl      { assets/stick }
 \dim_gset:Nn \g__mahjongtiles_stick_height_dim  { \baselineskip }
-\fp_gset:Nn  \g__mahjongtiles_stick_scale_fp   { .5 }
+\fp_gset:Nn  \g__mahjongtiles_stick_scale_fp   { 1 }
 \dim_gset:Nn \g__mahjongtiles_stick_sep_dim     { .6em }
 
 \tl_new:N   \g__mahjongtiles_back_color_tl
@@ -488,7 +492,7 @@
 % Tuple helpers
 % Pending tuple: {face}{orientation}{overlay}
 % Output tuple:  {kind}{a}{b}{c}{overlay}
-%   tile = {tile}{face}{suit}{orientation}{overlay}; suit may be empty for x and ?
+%   tile = {tile}{face}{suit}{orientation}{overlay}; suit may be m, p, s, z, f, or empty for x and ?
 %   akastack = {akastack}{suit}{level}{ }{overlay}; red-five edge stack
 %   draw = {draw}{face}{suit}{ }{ }; drawn tile rendered sideways above the hand row
 %   gap  = {gap}{n}{ }{ }{ }; n means n/7 of one tile width
@@ -806,7 +810,7 @@
     \tl_if_in:nnTF { 0123456789 } {#1}
       { \__mahjongtiles_pending_put:nn {#1} {0} }
       {
-        \tl_if_in:nnTF { mpsz } {#1}
+        \tl_if_in:nnTF { mpszf } {#1}
           { \__mahjongtiles_flush_suit:n {#1} }
           {
             \str_case:nnF {#1}
@@ -844,32 +848,50 @@
       {
         \__mahjongtiles_detect_concealed_kong:
         \bool_if:NTF \l__mahjongtiles_concealed_kong_bool
-          { \__mahjongtiles_flush_concealed_kong:n {#1} }
           {
-            \seq_map_inline:Nn \l__mahjongtiles_pending_seq
-              { \__mahjongtiles_flush_pending_item:nnnn ##1 {#1} }
+            \tl_if_in:nnTF { mpsz } {#1}
+              { \__mahjongtiles_flush_concealed_kong:n {#1} }
+              { \__mahjongtiles_flush_pending_suit:n {#1} }
           }
+          { \__mahjongtiles_flush_pending_suit:n {#1} }
         \seq_clear:N \l__mahjongtiles_pending_seq
       }
   }
 
+\cs_new_protected:Npn \__mahjongtiles_flush_pending_suit:n #1
+  {
+    \seq_map_inline:Nn \l__mahjongtiles_pending_seq
+      { \__mahjongtiles_flush_pending_item:nnnn ##1 {#1} }
+  }
+
 \cs_new_protected:Npn \__mahjongtiles_flush_pending_item:nnnn #1#2#3#4
   {
-    \str_if_eq:nnTF {#1} {0}
+    \str_if_eq:nnTF {#4} {f}
+      { \__mahjongtiles_flush_flower_item:nnn {#1} {#2} {#3} }
       {
-        \tl_if_in:nnTF { mps } {#4}
+        \str_if_eq:nnTF {#1} {0}
           {
-            \int_case:nnF {#2}
+            \tl_if_in:nnTF { mps } {#4}
               {
-                {3} { \__mahjongtiles_akastack_put:nnn {#4} {1} {#3} }
-                {4} { \__mahjongtiles_akastack_put:nnn {#4} {2} {#3} }
-                {5} { \__mahjongtiles_akastack_put:nnn {#4} {3} {#3} }
+                \int_case:nnF {#2}
+                  {
+                    {3} { \__mahjongtiles_akastack_put:nnn {#4} {1} {#3} }
+                    {4} { \__mahjongtiles_akastack_put:nnn {#4} {2} {#3} }
+                    {5} { \__mahjongtiles_akastack_put:nnn {#4} {3} {#3} }
+                  }
+                  { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
               }
               { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
           }
           { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
       }
-      { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {#4} {#2} {#3} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_flush_flower_item:nnn #1#2#3
+  {
+    \tl_if_in:nnTF { 12345 } {#1}
+      { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {f} {#2} {#3} }
+      { \msg_error:nnn { mahjong-tiles } { invalid-flower } {#1} }
   }
 
 \cs_new_protected:Npn \__mahjongtiles_detect_concealed_kong:
