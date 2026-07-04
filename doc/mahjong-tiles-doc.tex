@@ -23,7 +23,7 @@
 
 \title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands and Discard Rivers}
 \author{Lilia Chen May Wither}
-\date{Version 2.5.0, 2026-07-04}
+\date{Version 2.6.0, 2026-07-04}
 
 \begin{document}
 \maketitle
@@ -123,7 +123,7 @@ local overrides such as:
 A tile is written as one or more digits followed by a suit letter.  The suits are
 \texttt{m} for manzu, \texttt{p} for pinzu, \texttt{s} for souzu, \texttt{z}
 for honors, and \texttt{f} for flower tiles.
-\begin{table}[H]S
+\begin{table}[H]
   \centering
   \caption[MPSZF reference]{MPSZF notation reference. Each tile is identified by its column's number and its row's letter.}
   \label{tab:mpszfref}
@@ -133,7 +133,7 @@ for honors, and \texttt{f} for flower tiles.
      \textbf{p} & \mahjong{0p} & \mahjong{1p} & \mahjong{2p} & \mahjong{3p} & \mahjong{4p} & \mahjong{5p} & \mahjong{6p} & \mahjong{7p} & \mahjong{8p} & \mahjong{9p} \\
      \textbf{m} & \mahjong{0m} & \mahjong{1m} & \mahjong{2m} & \mahjong{3m} & \mahjong{4m} & \mahjong{5m} & \mahjong{6m} & \mahjong{7m} & \mahjong{8m} & \mahjong{9m} \\
      \textbf{z} & & \mahjong{1z} & \mahjong{2z} & \mahjong{3z} & \mahjong{4z} & \mahjong{5z} & \mahjong{6z} & \mahjong{7z} & & \\
-     \textbf{f} & & \mahjong{1f} & \mahjong{2f} & \mahjong{3f} & \mahjong{4f} & \mahjong{5f} & & & &
+     \textbf{f} & \mahjong{0f} & \mahjong{1f} & \mahjong{2f} & \mahjong{3f} & \mahjong{4f} & \mahjong{5f} & \mahjong{6f} & \mahjong{7f} & \mahjong{8f} &
   \end{tabular}
 \end{table}
 
@@ -146,7 +146,7 @@ Input & Output \\
 \code{111m456s111p11122z} & \mahjong{111m456s111p11122z} \\
 \code{1112345678999p} & \mahjong{1112345678999p} \\
 \code{19m19s19p1234567z} & \mahjong{19m19s19p1234567z} \\
-\code{1234f} & \mahjong{1234f} \\
+\code{012345678f} & \mahjong{012345678f} \\
 \code{123m55p12f} & \mahjong{123m55p12f} \\
 \bottomrule
 \end{longtable}

@@ -8,7 +8,7 @@
 % This file is distributed under the MIT Licence; see LICENCE.
 %
 %<*driver>
-\ProvidesFile{mahjong-tiles.dtx}[2026/07/04 v2.5.0mahjong-tiles documented source]
+\ProvidesFile{mahjong-tiles.dtx}[2026/07/04 v2.6.0mahjong-tiles documented source]
 \documentclass{ltxdoc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -889,7 +889,7 @@
 
 \cs_new_protected:Npn \__mahjongtiles_flush_flower_item:nnn #1#2#3
   {
-    \tl_if_in:nnTF { 12345 } {#1}
+    \tl_if_in:nnTF { 012345678 } {#1}
       { \__mahjongtiles_tile_put_aka_aware:nnnn {#1} {f} {#2} {#3} }
       { \msg_error:nnn { mahjong-tiles } { invalid-flower } {#1} }
   }
