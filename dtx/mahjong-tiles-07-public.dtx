@@ -1,0 +1,117 @@
+% \iffalse meta-comment
+% dtx/mahjong-tiles-07-public.dtx -- public commands for mahjong-tiles
+%
+% Copyright (c) 2021 Daniel Schmitz
+% Copyright (c) 2026 Lilia Chen May Wither
+%
+% This file is distributed under the MIT Licence; see LICENCE.
+% \fi
+%
+% \subsection{Public commands}
+%
+%    \begin{macrocode}
+%<*package>
+% -----------------------------------------------------------------------------
+% Public commands
+% -----------------------------------------------------------------------------
+\cs_new_protected:Npn \__mahjongtiles_set_local_defaults:
+  {
+    \dim_set_eq:NN \l__mahjongtiles_tile_height_dim \g__mahjongtiles_default_height_dim
+    \fp_set_eq:NN  \l__mahjongtiles_tile_scale_fp  \g__mahjongtiles_default_scale_fp
+    \tl_set_eq:NN  \l__mahjongtiles_overlay_style_tl \g__mahjongtiles_overlay_style_tl
+    \int_set_eq:NN \l__mahjongtiles_river_cols_int \g__mahjongtiles_river_cols_int
+    \dim_set_eq:NN \l__mahjongtiles_river_row_gap_dim \g__mahjongtiles_river_row_gap_dim
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_apply_local_options:nnnn #1#2#3#4
+  {
+    \__mahjongtiles_set_local_defaults:
+    \tl_if_in:nnTF {#1} { = }
+      { \keys_set:nn { mahjong-tiles / local } {#1} }
+      {
+        \str_if_eq:nnTF {#1} { no-aka }
+          { \keys_set:nn { mahjong-tiles / local } {#1} }
+          {
+            \dim_set:Nn \l__mahjongtiles_tile_height_dim {#1}
+            \fp_set:Nn  \l__mahjongtiles_tile_scale_fp  {#2}
+            \IfNoValueF {#3}
+              { \__mahjongtiles_set_back_color_local:n {#3} }
+          }
+      }
+    \tl_if_blank:nF {#4}
+      { \keys_set:nn { mahjong-tiles / local } {#4} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_ensure_local_defaults:
+  {
+    \dim_compare:nNnT { \l__mahjongtiles_tile_height_dim } = { 0pt }
+      { \__mahjongtiles_set_local_defaults: }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_mj:n #1
+  {
+    \int_compare:nNnTF { \l__mahjongtiles_mj_depth_int } > {0}
+      { \msg_error:nnn { mahjong-tiles } { nested-mj } {#1} }
+      {
+        \group_begin:
+          \__mahjongtiles_ensure_local_defaults:
+          \int_incr:N \l__mahjongtiles_mj_depth_int
+          \__mahjongtiles_render_hand:n {#1}
+        \group_end:
+      }
+  }
+
+\cs_new_protected:Npn \mahjongtiles_typeset_hand:n #1
+  {
+    \group_begin:
+      \__mahjongtiles_set_local_defaults:
+      \__mahjongtiles_render_hand:n {#1}
+    \group_end:
+  }
+
+\cs_new_protected:Npn \mahjongtiles:n #1
+  { \mahjongtiles_typeset_hand:n {#1} }
+
+\cs_new_protected:Npn \mahjongtiles_typeset_river:n #1
+  {
+    \group_begin:
+      \__mahjongtiles_set_local_defaults:
+      \__mahjongtiles_render_river:n {#1}
+    \group_end:
+  }
+
+\cs_new_protected:Npn \mahjongtilesriver:n #1
+  { \mahjongtiles_typeset_river:n {#1} }
+
+\NewDocumentCommand \mj { m }
+  { \__mahjongtiles_mj:n {#1} }
+
+\NewDocumentCommand \mahjong { O{\g__mahjongtiles_default_height_dim} O{\g__mahjongtiles_default_scale_fp} o O{} m }
+  {
+    \group_begin:
+      \__mahjongtiles_apply_local_options:nnnn {#1} {#2} {#3} {#4}
+      \__mahjongtiles_render_hand:n {#5}
+    \group_end:
+  }
+
+\NewDocumentCommand \mahjongriver { O{\g__mahjongtiles_default_height_dim} O{\g__mahjongtiles_default_scale_fp} o O{} m }
+  {
+    \group_begin:
+      \__mahjongtiles_apply_local_options:nnnn {#1} {#2} {#3} {#4}
+      \__mahjongtiles_render_river:n {#5}
+    \group_end:
+  }
+
+\NewDocumentCommand \stick { O{} m }
+  { \__mahjongtiles_stick:nn {#1} {#2} }
+
+\NewDocumentCommand \mahjongtilessetup { m }
+  {
+    \keys_set:nn { mahjong-tiles } {#1}
+  }
+
+\ExplSyntaxOff
+%<package>\endinput
+%</package>
+%    \end{macrocode}
+\endinput

@@ -1,0 +1,91 @@
+% \iffalse meta-comment
+% dtx/mahjong-tiles-01-messages.dtx -- messages for mahjong-tiles
+%
+% Copyright (c) 2021 Daniel Schmitz
+% Copyright (c) 2026 Lilia Chen May Wither
+%
+% This file is distributed under the MIT Licence; see LICENCE.
+% \fi
+%
+% \subsection{Messages}
+%
+%    \begin{macrocode}
+%<*package>
+% -----------------------------------------------------------------------------
+% Messages
+% -----------------------------------------------------------------------------
+\msg_new:nnnn { mahjong-tiles } { invalid-token }
+  { Token~'#1'~is~not~valid~in~Mahjong~MPSZF~notation. }
+  { Valid~tokens~are~0--9,~m,~p,~s,~z,~f,~x,~?,~-,~',~",~*,~+,~[text],~\mj\{tile\},~and~spaces. }
+
+\msg_new:nnnn { mahjong-tiles } { unknown-tile }
+  { I~cannot~find~tile~'#1'. }
+  { Check~that~the~tile~PDF~exists~under~the~configured~tile-dir. }
+
+\msg_new:nnnn { mahjong-tiles } { unknown-orientation }
+  { Orientation~'#1'~is~unknown. }
+  { This~is~an~internal~error;~valid~orientations~are~0,~1,~and~2. }
+
+\msg_new:nnnn { mahjong-tiles } { missing-suit }
+  { Tile~digit(s)~'#1'~do~not~have~a~suit. }
+  { Add~m,~p,~s,~z,~or~f~after~the~digit~group,~or~use~N-~for~a~separator. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-flower }
+  { Flower~tile~'#1f'~is~not~supported. }
+  { Flower~tiles~are~0f~to~8f. }
+
+\msg_new:nnnn { mahjong-tiles } { missing-rotation-target }
+  { Rotation~marker~'#1'~has~no~tile~to~rotate. }
+  { Put~the~marker~after~a~digit,~x,~?,~or~a~completed~tile~group. }
+
+\msg_new:nnnn { mahjong-tiles } { missing-overlay-target }
+  { Overlay~text~'#1'~has~no~tile~to~annotate. }
+  { Put~[text]~after~a~digit,~x,~?,~or~a~completed~tile~group. }
+
+\msg_new:nnnn { mahjong-tiles } { unclosed-overlay }
+  { Overlay~text~was~started~with~'['~but~no~closing~']'~was~found. }
+  { Add~a~closing~']'.~Nested~literal~square~brackets~are~not~supported. }
+
+\msg_new:nnnn { mahjong-tiles } { concealed-kong-overlay }
+  { Overlay~text~'#1'~is~attached~to~the~final~back~tile~of~a~concealed~kong. }
+  { This~warning~confirms~that~the~postfix~annotation~targets~the~expanded~kong~tail. }
+
+\msg_new:nnnn { mahjong-tiles } { nested-mj }
+  { The~\mj~command~cannot~be~nested. }
+  { mahjong-tiles~only~expands~one~level~of~\mj\{...\}. }
+
+\msg_new:nnnn { mahjong-tiles } { inline-mj-single-tile }
+  { Inline~\mj\{#1\}~must~contain~exactly~one~Mahjong~tile. }
+  { Use~one~simple~tile~such~as~\mj\{2z\}.~Do~not~put~a~hand,~gap,~or~meld~inside~inline~\mj. }
+
+\msg_new:nnnn { mahjong-tiles } { inline-mj-tile-only }
+  { Inline~\mj\{#1\}~did~not~produce~a~plain~tile. }
+  { Inline~\mj~inside~\mahjong\{...\}~is~reserved~for~one~drawn~tile. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-aka }
+  { Aka~option~'#1'~must~be~one~of~0,~1,~or~2. }
+  { Use~aka=0~for~no~red~fives,~aka=1~for~normal~red~fives,~or~aka=2~for~an~extra~red~5p~in~concealed~kongs. }
+
+\msg_new:nnnn { mahjong-tiles } { deprecated-no-aka }
+  { Option~'#1'~is~deprecated;~use~'#2'~instead. }
+  { The~legacy~no-aka~option~is~accepted~for~backward~compatibility~only. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-no-aka }
+  { No-aka~option~'#1'~must~be~one~of~0,~1,~false,~or~true. }
+  { Use~aka=0~instead~of~no-aka=1,~or~aka=1~instead~of~no-aka=0. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-stick-amount }
+  { Stick~amount~'#1'~must~be~a~one-,~two-,~or~three-digit~integer. }
+  { Use~\stick\{305\}~for~30500,~or~use~manual~counts~such~as~\stick\{10k=3,100=5\}. }
+
+\msg_new:nnnn { mahjong-tiles } { invalid-stick-manual }
+  { Manual~stick~spec~'#1'~must~contain~four~counts. }
+  { Use~10k,~5k,~1k,~100~order,~for~example~\stick[manual]\{3,0,0,5\},~or~use~key-values~such~as~\stick\{10k=3,100=5\}. }
+
+\msg_new:nnnn { mahjong-tiles } { unknown-stick }
+  { I~cannot~find~stick~artwork~'#1'. }
+  { Check~that~10k.pdf,~5k.pdf,~1k.pdf,~and~100.pdf~exist~under~the~configured~stick-dir. }
+
+%</package>
+%    \end{macrocode}
+\endinput

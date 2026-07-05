@@ -24,7 +24,7 @@
 
 \title{The \pkg{mahjong-tiles} Package\\\large Typesetting Riichi Mahjong Hands, Flower Tiles, Discard Rivers, and Score Sticks}
 \author{Lilia Chen May Wither}
-\date{Version 2.6.0, 2026-07-04}
+\date{Version 2.6.1, 2026-07-04}
 
 \begin{document}
 \maketitle
@@ -58,8 +58,9 @@ latex mahjong-tiles.ins
 
 The distributed user manual is \path{doc/mahjong-tiles-doc.pdf}, and its
 source is \path{doc/mahjong-tiles-doc.tex}.  The documented implementation is
-\path{mahjong-tiles.dtx}; \path{mahjong-tiles.ins} extracts the runtime style
-file.
+split between the top-level driver \path{mahjong-tiles.dtx} and the fragments in
+\path{dtx/}; \path{mahjong-tiles.ins} extracts the runtime style file from those
+fragments.
 
 With the default artwork paths, install these items together in the same
 TeX-searchable package directory:

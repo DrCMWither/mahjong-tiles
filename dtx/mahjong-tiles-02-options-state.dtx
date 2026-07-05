@@ -1,0 +1,332 @@
+% \iffalse meta-comment
+% dtx/mahjong-tiles-02-options-state.dtx -- package options and state for mahjong-tiles
+%
+% Copyright (c) 2021 Daniel Schmitz
+% Copyright (c) 2026 Lilia Chen May Wither
+%
+% This file is distributed under the MIT Licence; see LICENCE.
+% \fi
+%
+% \subsection{Package options and state}
+%
+%    \begin{macrocode}
+%<*package>
+% -----------------------------------------------------------------------------
+% Package options and state
+% -----------------------------------------------------------------------------
+\dim_new:N \g__mahjongtiles_default_height_dim
+\fp_new:N  \g__mahjongtiles_default_scale_fp
+\tl_new:N  \g__mahjongtiles_tile_dir_tl
+\int_new:N \g__mahjongtiles_river_cols_int
+\dim_new:N \g__mahjongtiles_river_row_gap_dim
+\tl_new:N  \g__mahjongtiles_stick_dir_tl
+\dim_new:N \g__mahjongtiles_stick_height_dim
+\fp_new:N  \g__mahjongtiles_stick_scale_fp
+\dim_new:N \g__mahjongtiles_stick_sep_dim
+
+\dim_gset:Nn \g__mahjongtiles_default_height_dim { \baselineskip }
+\fp_gset:Nn  \g__mahjongtiles_default_scale_fp  { 0.75 }
+\tl_gset:Nn  \g__mahjongtiles_tile_dir_tl       { tiles }
+\int_gset:Nn \g__mahjongtiles_river_cols_int    { 6 }
+\dim_gset:Nn \g__mahjongtiles_river_row_gap_dim { 0pt }
+\tl_gset:Nn  \g__mahjongtiles_stick_dir_tl      { assets/stick }
+\dim_gset:Nn \g__mahjongtiles_stick_height_dim  { \baselineskip }
+\fp_gset:Nn  \g__mahjongtiles_stick_scale_fp   { 0.5 }
+\dim_gset:Nn \g__mahjongtiles_stick_sep_dim     { .6em }
+
+\tl_new:N   \g__mahjongtiles_back_color_tl
+\tl_new:N   \g__mahjongtiles_overlay_style_tl
+\bool_new:N \g__mahjongtiles_back_recolor_bool
+\int_new:N  \g__mahjongtiles_aka_int
+
+\tl_gclear:N \g__mahjongtiles_back_color_tl
+\tl_gset:Nn \g__mahjongtiles_overlay_style_tl
+  {
+    font = \scriptsize,
+    align = center,
+    anchor = south,
+    inner~sep = 0.2pt,
+    outer~sep = 0pt,
+    yshift = 0.35em
+  }
+
+\bool_gset_false:N \g__mahjongtiles_back_recolor_bool
+\int_gset:Nn \g__mahjongtiles_aka_int { 1 }
+
+\cs_new_protected:Npn \__mahjongtiles_set_back_color_global:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      {
+        \tl_gclear:N \g__mahjongtiles_back_color_tl
+        \bool_gset_false:N \g__mahjongtiles_back_recolor_bool
+      }
+      {
+        \str_if_eq:nnTF {#1} { none }
+          {
+            \tl_gclear:N \g__mahjongtiles_back_color_tl
+            \bool_gset_false:N \g__mahjongtiles_back_recolor_bool
+          }
+          {
+            \tl_gset:Nn \g__mahjongtiles_back_color_tl {#1}
+            \bool_gset_true:N \g__mahjongtiles_back_recolor_bool
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_set_back_color_local:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      {
+        \tl_clear:N \g__mahjongtiles_back_color_tl
+        \bool_set_false:N \g__mahjongtiles_back_recolor_bool
+      }
+      {
+        \str_if_eq:nnTF {#1} { none }
+          {
+            \tl_clear:N \g__mahjongtiles_back_color_tl
+            \bool_set_false:N \g__mahjongtiles_back_recolor_bool
+          }
+          {
+            \tl_set:Nn \g__mahjongtiles_back_color_tl {#1}
+            \bool_set_true:N \g__mahjongtiles_back_recolor_bool
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_set_aka_global:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { 0 } { \int_gset:Nn \g__mahjongtiles_aka_int {0} }
+        { 1 } { \int_gset:Nn \g__mahjongtiles_aka_int {1} }
+        { 2 } { \int_gset:Nn \g__mahjongtiles_aka_int {2} }
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-aka } { aka=#1 } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_set_aka_local:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { 0 } { \int_set:Nn \g__mahjongtiles_aka_int {0} }
+        { 1 } { \int_set:Nn \g__mahjongtiles_aka_int {1} }
+        { 2 } { \int_set:Nn \g__mahjongtiles_aka_int {2} }
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-aka } { aka=#1 } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_warn_deprecated_no_aka:nn #1#2
+  { \msg_warning:nnnn { mahjong-tiles } { deprecated-no-aka } {#1} {#2} }
+
+\cs_new_protected:Npn \__mahjongtiles_set_no_aka_global:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { 1 }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=1 } { aka=0 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { true }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=true } { aka=0 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { 0 }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=0 } { aka=1 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {1}
+          }
+        { false }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=false } { aka=1 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {1}
+          }
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-no-aka } { no-aka=#1 } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_set_no_aka_local:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { 1 }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=1 } { aka=0 }
+            \int_set:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { true }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=true } { aka=0 }
+            \int_set:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { 0 }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=0 } { aka=1 }
+            \int_set:Nn \g__mahjongtiles_aka_int {1}
+          }
+        { false }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=false } { aka=1 }
+            \int_set:Nn \g__mahjongtiles_aka_int {1}
+          }
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-no-aka } { no-aka=#1 } }
+  }
+
+\keys_define:nn { mahjong-tiles }
+  {
+    height   .dim_gset:N = \g__mahjongtiles_default_height_dim,
+    scale    .fp_gset:N  = \g__mahjongtiles_default_scale_fp,
+    tile-dir .tl_gset:N  = \g__mahjongtiles_tile_dir_tl,
+    stick-dir .tl_gset:N = \g__mahjongtiles_stick_dir_tl,
+    stick-dir .value_required:n = true,
+    stick-height .dim_gset:N = \g__mahjongtiles_stick_height_dim,
+    stick-height .value_required:n = true,
+    stick-scale .fp_gset:N = \g__mahjongtiles_stick_scale_fp,
+    stick-scale .value_required:n = true,
+    stick-sep .dim_gset:N = \g__mahjongtiles_stick_sep_dim,
+    stick-sep .value_required:n = true,
+    river-cols .int_gset:N = \g__mahjongtiles_river_cols_int,
+    river-cols .value_required:n = true,
+    river-row-gap .dim_gset:N = \g__mahjongtiles_river_row_gap_dim,
+    river-row-gap .value_required:n = true,
+    overlay-style .tl_gset:N = \g__mahjongtiles_overlay_style_tl,
+    overlay-style .value_required:n = true,
+
+    color .code:n =
+      { \__mahjongtiles_set_back_color_global:n {#1} },
+    color .value_required:n = true,
+
+    aka .code:n =
+      { \__mahjongtiles_set_aka_global:n {#1} },
+    aka .default:n = 1,
+
+    no-aka .code:n =
+      { \__mahjongtiles_set_no_aka_global:n {#1} },
+    no-aka .default:n = 1,
+  }
+\ProcessKeysOptions { mahjong-tiles }
+
+\dim_new:N \l__mahjongtiles_tile_height_dim
+\dim_new:N \l__mahjongtiles_tile_width_dim
+\dim_new:N \l__mahjongtiles_symbol_height_dim
+\dim_new:N \l__mahjongtiles_baseline_offset_dim
+\fp_new:N  \l__mahjongtiles_tile_scale_fp
+\int_new:N \l__mahjongtiles_river_cols_int
+\dim_new:N \l__mahjongtiles_river_row_gap_dim
+\tl_new:N  \l__mahjongtiles_overlay_style_tl
+\int_new:N \l__mahjongtiles_river_col_int
+\int_new:N \l__mahjongtiles_river_seen_tiles_int
+\int_new:N \l__mahjongtiles_river_total_tiles_int
+
+\seq_new:N \l__mahjongtiles_tiles_seq
+\seq_new:N \l__mahjongtiles_pending_seq
+\tl_new:N  \l__mahjongtiles_pending_digits_tl
+\tl_new:N  \l__mahjongtiles_tmp_tl
+\tl_new:N  \l__mahjongtiles_tmpa_tl
+\tl_new:N  \l__mahjongtiles_tmpb_tl
+\clist_new:N \l__mahjongtiles_tmp_clist
+\tl_new:N  \l__mahjongtiles_first_face_tl
+\tl_new:N  \l__mahjongtiles_file_tl
+\box_new:N \l__mahjongtiles_tile_box
+\int_new:N \l__mahjongtiles_tmp_int
+\int_new:N \l__mahjongtiles_mj_depth_int
+\bool_new:N \l__mahjongtiles_concealed_kong_bool
+\bool_new:N \l__mahjongtiles_last_concealed_kong_tail_bool
+
+\tl_new:N  \l__mahjongtiles_stick_dir_tl
+\dim_new:N \l__mahjongtiles_stick_height_dim
+\dim_new:N \l__mahjongtiles_stick_draw_height_dim
+\fp_new:N  \l__mahjongtiles_stick_scale_fp
+\dim_new:N \l__mahjongtiles_stick_sep_dim
+\int_new:N \l__mahjongtiles_stick_amount_int
+\int_new:N \l__mahjongtiles_stick_remainder_int
+\int_new:N \l__mahjongtiles_stick_tenk_int
+\int_new:N \l__mahjongtiles_stick_fivek_int
+\int_new:N \l__mahjongtiles_stick_onek_int
+\int_new:N \l__mahjongtiles_stick_hundred_int
+\bool_new:N \l__mahjongtiles_stick_manual_bool
+\bool_new:N \l__mahjongtiles_stick_has_output_bool
+
+\tl_new:N   \g__mahjongtiles_inline_mj_face_tl
+\tl_new:N   \g__mahjongtiles_inline_mj_suit_tl
+\bool_new:N \g__mahjongtiles_inline_mj_valid_bool
+
+\keys_define:nn { mahjong-tiles / local }
+  {
+    height .dim_set:N = \l__mahjongtiles_tile_height_dim,
+    scale  .fp_set:N  = \l__mahjongtiles_tile_scale_fp,
+    river-cols .int_set:N = \l__mahjongtiles_river_cols_int,
+    river-cols .value_required:n = true,
+    river-row-gap .dim_set:N = \l__mahjongtiles_river_row_gap_dim,
+    river-row-gap .value_required:n = true,
+    overlay-style .tl_set:N = \l__mahjongtiles_overlay_style_tl,
+    overlay-style .value_required:n = true,
+
+    color .code:n =
+      { \__mahjongtiles_set_back_color_local:n {#1} },
+    color .value_required:n = true,
+
+    aka .code:n =
+      { \__mahjongtiles_set_aka_local:n {#1} },
+    aka .default:n = 1,
+
+    no-aka .code:n =
+      { \__mahjongtiles_set_no_aka_local:n {#1} },
+    no-aka .default:n = 1,
+  }
+
+\keys_define:nn { mahjong-tiles / stick }
+  {
+    height .dim_set:N = \l__mahjongtiles_stick_height_dim,
+    height .value_required:n = true,
+    scale .fp_set:N = \l__mahjongtiles_stick_scale_fp,
+    scale .value_required:n = true,
+    sep .dim_set:N = \l__mahjongtiles_stick_sep_dim,
+    sep .value_required:n = true,
+    stick-dir .tl_set:N = \l__mahjongtiles_stick_dir_tl,
+    stick-dir .value_required:n = true,
+    dir .tl_set:N = \l__mahjongtiles_stick_dir_tl,
+    dir .value_required:n = true,
+
+    manual .choice:,
+    manual / true .code:n = { \bool_set_true:N \l__mahjongtiles_stick_manual_bool },
+    manual / false .code:n = { \bool_set_false:N \l__mahjongtiles_stick_manual_bool },
+    manual .default:n = true,
+    auto .code:n = { \bool_set_false:N \l__mahjongtiles_stick_manual_bool },
+    auto .default:n = true,
+
+    10k .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_tenk_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+    5k .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_fivek_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+    1k .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_onek_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+    100 .code:n =
+      {
+        \int_set:Nn \l__mahjongtiles_stick_hundred_int {#1}
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      },
+
+    10000 .meta:n = { 10k = #1 },
+    5000 .meta:n = { 5k = #1 },
+    1000 .meta:n = { 1k = #1 },
+    ten-thousand .meta:n = { 10k = #1 },
+    five-thousand .meta:n = { 5k = #1 },
+    thousand .meta:n = { 1k = #1 },
+    hundred .meta:n = { 100 = #1 },
+  }
+
+%</package>
+%    \end{macrocode}
+\endinput

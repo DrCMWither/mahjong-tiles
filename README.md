@@ -4,11 +4,13 @@
 
 ## Installation & Setup
 
-Generate the runtime package file from the documented source when needed:
+Generate the runtime package file from the split documented sources when needed:
 
 ```bash
 latex mahjong-tiles.ins
 ```
+
+The top-level `mahjong-tiles.dtx` is the documented-source driver; the implementation fragments live under `dtx/` and are extracted in order by `mahjong-tiles.ins`.
 
 Then install these files together in a TeX-searchable package directory, or keep them in the same working directory as your document:
 
@@ -215,9 +217,10 @@ The compact comma-list form uses the order `10k, 5k, 1k, 100`.
 This package supports compilation using the standard `pdflatex` engine. To view the test results, you can directly compile the provided test file:
 
 ```bash
-make doc      # build the manual
-make example  # build the example document
-make check    # regenerate the package and build both PDFs
+make doc       # build the manual
+make example   # build the example document
+make code-doc  # build the documented implementation from the split dtx files
+make check     # regenerate the package and build both PDFs
 ```
 
 ## Acknowledgments

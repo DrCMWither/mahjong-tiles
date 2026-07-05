@@ -1,0 +1,44 @@
+% \iffalse meta-comment
+% dtx/mahjong-tiles-00-preamble.dtx -- package preamble for mahjong-tiles
+%
+% Copyright (c) 2021 Daniel Schmitz
+% Copyright (c) 2026 Lilia Chen May Wither
+%
+% This file is distributed under the MIT Licence; see LICENCE.
+% \fi
+%
+% \subsection{Package preamble}
+%
+%    \begin{macrocode}
+%<*package>
+%% mahjong-tiles.sty -- Typeset Japanese/Riichi Mahjong tiles from compact MPSZF notation.
+%%
+%% This package is derived from and extends Daniel Schmitz's mahjong package.
+%% Copyright (c) 2021 Daniel Schmitz.
+%% mahjong-tiles modifications are copyright (c) 2026 Lilia Chen May Wither.
+%%
+%% The package name and file prefix are mahjong-tiles; the LaTeX3 namespace is mahjongtiles.
+%% The public hand command is \mahjong for compact document markup.
+%% Distributed under the MIT Licence; see LICENCE.
+%% Tile artwork in tiles/ is credited to FluffyStuff/riichi-mahjong-tiles;
+%% additional flower-tile and score-stick assets are credited in README.md and LICENCE.
+%% see README.md and LICENCE for details.
+
+\NeedsTeXFormat{LaTeX2e}[2020/10/01]
+\RequirePackage{expl3}
+\ProvidesExplPackage{mahjong-tiles}{2026/07/04}{2.6.1}{Typeset Japanese/Riichi Mahjong hands, flower tiles, discard rivers, and score sticks}
+
+\RequirePackage{xparse}
+\RequirePackage{l3keys2e}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\definecolor{mahjongtilesbackred}{rgb}{1,0.215576,0.215576}
+\RequirePackage{tikz}
+\RequirePackage{stackengine}
+\providecommand\ctimes{\ensuremath{\times}}
+
+\ExplSyntaxOn
+
+%</package>
+%    \end{macrocode}
+\endinput

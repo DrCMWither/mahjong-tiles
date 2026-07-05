@@ -17,7 +17,7 @@ Project: mahjong-tiles -- Typeset Japanese/Riichi Mahjong hands, flower tiles, d
 
 Copyright (c) 2021 Daniel Schmitz
 Copyright (c) 2026 Lilia Chen May Wither
-This file was generated from mahjong-tiles.dtx by docstrip.
+This file was generated from the mahjong-tiles documented source files by docstrip.
 
 The package code is distributed under the MIT Licence; see LICENCE for the
 complete licence text and tile-artwork attribution.
@@ -31,7 +31,16 @@ End of generated file.
 \endpostamble
 
 \generate{
-  \file{mahjong-tiles.sty}{\from{mahjong-tiles.dtx}{package}}
+  \file{mahjong-tiles.sty}{%
+    \from{dtx/mahjong-tiles-00-preamble.dtx}{package}%
+    \from{dtx/mahjong-tiles-01-messages.dtx}{package}%
+    \from{dtx/mahjong-tiles-02-options-state.dtx}{package}%
+    \from{dtx/mahjong-tiles-03-tuples.dtx}{package}%
+    \from{dtx/mahjong-tiles-04-parser.dtx}{package}%
+    \from{dtx/mahjong-tiles-05-rendering.dtx}{package}%
+    \from{dtx/mahjong-tiles-06-sticks.dtx}{package}%
+    \from{dtx/mahjong-tiles-07-public.dtx}{package}%
+  }
 }
 
 \obeyspaces

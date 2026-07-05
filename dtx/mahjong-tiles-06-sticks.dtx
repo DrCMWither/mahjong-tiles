@@ -1,0 +1,152 @@
+% \iffalse meta-comment
+% dtx/mahjong-tiles-06-sticks.dtx -- stick rendering for mahjong-tiles
+%
+% Copyright (c) 2021 Daniel Schmitz
+% Copyright (c) 2026 Lilia Chen May Wither
+%
+% This file is distributed under the MIT Licence; see LICENCE.
+% \fi
+%
+% \subsection{Stick rendering}
+%
+%    \begin{macrocode}
+%<*package>
+% -----------------------------------------------------------------------------
+% Stick rendering
+% -----------------------------------------------------------------------------
+\cs_new:Npn \__mahjongtiles_stick_file:n #1
+  { \l__mahjongtiles_stick_dir_tl / #1.pdf }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_set_local_defaults:
+  {
+    \tl_set_eq:NN \l__mahjongtiles_stick_dir_tl \g__mahjongtiles_stick_dir_tl
+    \dim_set_eq:NN \l__mahjongtiles_stick_height_dim \g__mahjongtiles_stick_height_dim
+    \fp_set_eq:NN \l__mahjongtiles_stick_scale_fp \g__mahjongtiles_stick_scale_fp
+    \dim_set_eq:NN \l__mahjongtiles_stick_sep_dim \g__mahjongtiles_stick_sep_dim
+    \int_zero:N \l__mahjongtiles_stick_amount_int
+    \int_zero:N \l__mahjongtiles_stick_remainder_int
+    \int_zero:N \l__mahjongtiles_stick_tenk_int
+    \int_zero:N \l__mahjongtiles_stick_fivek_int
+    \int_zero:N \l__mahjongtiles_stick_onek_int
+    \int_zero:N \l__mahjongtiles_stick_hundred_int
+    \bool_set_false:N \l__mahjongtiles_stick_manual_bool
+    \bool_set_false:N \l__mahjongtiles_stick_has_output_bool
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_compute_counts:
+  {
+    \int_set_eq:NN \l__mahjongtiles_stick_remainder_int \l__mahjongtiles_stick_amount_int
+    \int_set:Nn \l__mahjongtiles_stick_tenk_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 10000 } }
+    \int_set:Nn \l__mahjongtiles_stick_remainder_int
+      { \int_mod:nn { \l__mahjongtiles_stick_remainder_int } { 10000 } }
+    \int_set:Nn \l__mahjongtiles_stick_fivek_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 5000 } }
+    \int_set:Nn \l__mahjongtiles_stick_remainder_int
+      { \int_mod:nn { \l__mahjongtiles_stick_remainder_int } { 5000 } }
+    \int_set:Nn \l__mahjongtiles_stick_onek_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 1000 } }
+    \int_set:Nn \l__mahjongtiles_stick_remainder_int
+      { \int_mod:nn { \l__mahjongtiles_stick_remainder_int } { 1000 } }
+    \int_set:Nn \l__mahjongtiles_stick_hundred_int
+      { \int_div_truncate:nn { \l__mahjongtiles_stick_remainder_int } { 100 } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_set_auto:n #1
+  {
+    \regex_match:nnTF { \A \s* [0-9] {1,3} \s* \Z } {#1}
+      {
+        \int_set:Nn \l__mahjongtiles_stick_amount_int { (#1) * 100 }
+        \__mahjongtiles_stick_compute_counts:
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-stick-amount } {#1} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_stick_counts:
+  {
+    \dim_set:Nn \l__mahjongtiles_stick_draw_height_dim
+      { \fp_to_decimal:N \l__mahjongtiles_stick_scale_fp \l__mahjongtiles_stick_height_dim }
+    \leavevmode
+    \__mahjongtiles_render_stick_count:nn { 10k } { \l__mahjongtiles_stick_tenk_int }
+    \__mahjongtiles_render_stick_count:nn { 5k } { \l__mahjongtiles_stick_fivek_int }
+    \__mahjongtiles_render_stick_count:nn { 1k } { \l__mahjongtiles_stick_onek_int }
+    \__mahjongtiles_render_stick_count:nn { 100 } { \l__mahjongtiles_stick_hundred_int }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_render_stick_count:nn #1#2
+  {
+    \int_compare:nNnT {#2} > {0}
+      {
+        \bool_if:NT \l__mahjongtiles_stick_has_output_bool
+          { \hspace { \l__mahjongtiles_stick_sep_dim } }
+        \__mahjongtiles_make_stick:n {#1}
+        \nobreak \, \ctimes \, \int_to_arabic:n {#2}
+        \bool_set_true:N \l__mahjongtiles_stick_has_output_bool
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_make_stick:n #1
+  {
+    \file_if_exist:nTF { \__mahjongtiles_stick_file:n {#1} }
+      {
+        \includegraphics
+          [ height = \l__mahjongtiles_stick_draw_height_dim ]
+          { \__mahjongtiles_stick_file:n {#1} }
+      }
+      { \msg_error:nnn { mahjong-tiles } { unknown-stick } { \__mahjongtiles_stick_file:n {#1} } }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_set_manual_clist:n #1
+  {
+    \clist_set:Nn \l__mahjongtiles_tmp_clist {#1}
+    \int_compare:nNnTF { \clist_count:N \l__mahjongtiles_tmp_clist } = {4}
+      {
+        \int_set:Nn \l__mahjongtiles_stick_tenk_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {1} }
+        \int_set:Nn \l__mahjongtiles_stick_fivek_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {2} }
+        \int_set:Nn \l__mahjongtiles_stick_onek_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {3} }
+        \int_set:Nn \l__mahjongtiles_stick_hundred_int
+          { \clist_item:Nn \l__mahjongtiles_tmp_clist {4} }
+        \bool_set_true:N \l__mahjongtiles_stick_manual_bool
+      }
+      { \msg_error:nnn { mahjong-tiles } { invalid-stick-manual } {#1} }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick_apply_arg:n #1
+  {
+    \tl_if_blank:nF {#1}
+      {
+        \bool_if:NTF \l__mahjongtiles_stick_manual_bool
+          {
+            \tl_if_in:nnTF {#1} { = }
+              { \keys_set:nn { mahjong-tiles / stick } {#1} }
+              { \__mahjongtiles_stick_set_manual_clist:n {#1} }
+          }
+          {
+            \tl_if_in:nnTF {#1} { = }
+              { \keys_set:nn { mahjong-tiles / stick } {#1} }
+              {
+                \tl_if_in:nnTF {#1} { , }
+                  { \__mahjongtiles_stick_set_manual_clist:n {#1} }
+                  { \__mahjongtiles_stick_set_auto:n {#1} }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \__mahjongtiles_stick:nn #1#2
+  {
+    \group_begin:
+      \__mahjongtiles_stick_set_local_defaults:
+      \tl_if_blank:nF {#1}
+        { \keys_set:nn { mahjong-tiles / stick } {#1} }
+      \__mahjongtiles_stick_apply_arg:n {#2}
+      \__mahjongtiles_render_stick_counts:
+    \group_end:
+  }
+
+%</package>
+%    \end{macrocode}
+\endinput
