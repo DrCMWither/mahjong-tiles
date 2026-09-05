@@ -142,6 +142,26 @@
             \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=false } { aka=1 }
             \int_gset:Nn \g__mahjongtiles_aka_int {1}
           }
+        { yes }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=0 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { on }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=0 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { no }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=1 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {1}
+          }
+        { off }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=1 }
+            \int_gset:Nn \g__mahjongtiles_aka_int {1}
+          }
       }
       { \msg_error:nnn { mahjong-tiles } { invalid-no-aka } { no-aka=#1 } }
   }
@@ -168,6 +188,26 @@
         { false }
           {
             \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=false } { aka=1 }
+            \int_set:Nn \g__mahjongtiles_aka_int {1}
+          }
+        { yes }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=0 }
+            \int_set:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { on }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=0 }
+            \int_set:Nn \g__mahjongtiles_aka_int {0}
+          }
+        { no }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=1 }
+            \int_set:Nn \g__mahjongtiles_aka_int {1}
+          }
+        { off }
+          {
+            \__mahjongtiles_warn_deprecated_no_aka:nn { no-aka=#1 } { aka=1 }
             \int_set:Nn \g__mahjongtiles_aka_int {1}
           }
       }

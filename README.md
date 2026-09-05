@@ -231,4 +231,4 @@ We extend our gratitude to the original author. While inheriting the underlying 
 
 The mahjong tiles used in this package were created by [@FluffyStuff](https://github.com/FluffyStuff).
 The original repository is [FluffyStuff/riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles), used under public domain/CC0.
-Assets under `tiles-tmp` and `aassets` were created by LCMWither, also used under public domain/CC0.
+Assets under `tiles-tmp` and `assets` were created by LCMWither, also used under public domain/CC0.
