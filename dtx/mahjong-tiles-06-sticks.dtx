@@ -14,8 +14,15 @@
 % -----------------------------------------------------------------------------
 % Stick rendering
 % -----------------------------------------------------------------------------
+
+\tl_const:Nn \c__mahjongtiles_stick_prefix_tl { mahjong-tiles- }
+
 \cs_new:Npn \__mahjongtiles_stick_file:n #1
-  { \l__mahjongtiles_stick_dir_tl / #1.pdf }
+  {
+    \tl_if_empty:NF \l__mahjongtiles_stick_dir_tl
+      { \l__mahjongtiles_stick_dir_tl / }
+    \c__mahjongtiles_stick_prefix_tl #1 .pdf
+  }
 
 \cs_new_protected:Npn \__mahjongtiles_stick_set_local_defaults:
   {

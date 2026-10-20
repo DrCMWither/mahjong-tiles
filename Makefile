@@ -1,7 +1,7 @@
 # Makefile for mahjong-tiles
 
 PACKAGE      = mahjong-tiles
-VERSION      = 2.6.2
+VERSION      = 2.6.3
 LATEX        ?= latex
 PDFLATEX     ?= pdflatex
 TEXMFHOME    ?= $(shell kpsewhich -var-value=TEXMFHOME 2>/dev/null || printf '%s' "$$HOME/texmf")
@@ -19,6 +19,7 @@ DTX_PARTS    = \
   $(DTXDIR)/$(PACKAGE)-06-sticks.dtx \
   $(DTXDIR)/$(PACKAGE)-07-public.dtx
 DTX_SOURCES  = $(PACKAGE).dtx $(DTX_PARTS)
+STICK_ASSETS = $(addprefix assets/stick/$(PACKAGE)-,100.pdf 1k.pdf 5k.pdf 10k.pdf)
 AUX_EXT      = aux bbl blg brf glo gls hd idx ilg ind lof log lot out toc synctex.gz fdb_latexmk fls
 
 .PHONY: all unpack doc example code-doc clean distclean install uninstall ctan check
@@ -32,13 +33,13 @@ $(PACKAGE).sty: $(PACKAGE).ins $(DTX_PARTS)
 
 doc: unpack doc/$(PACKAGE)-doc.pdf
 
-doc/$(PACKAGE)-doc.pdf: doc/$(PACKAGE)-doc.tex $(PACKAGE).sty tiles/$(PACKAGE)-1m.pdf assets/stick/100.pdf assets/stick/1k.pdf assets/stick/5k.pdf assets/stick/10k.pdf
+doc/$(PACKAGE)-doc.pdf: doc/$(PACKAGE)-doc.tex $(PACKAGE).sty tiles/$(PACKAGE)-1m.pdf $(STICK_ASSETS)
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error -output-directory=doc doc/$(PACKAGE)-doc.tex
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error -output-directory=doc doc/$(PACKAGE)-doc.tex
 
 example: unpack doc/$(PACKAGE)-example.pdf
 
-doc/$(PACKAGE)-example.pdf: doc/$(PACKAGE)-example.tex $(PACKAGE).sty tiles/$(PACKAGE)-1m.pdf assets/stick/100.pdf assets/stick/1k.pdf assets/stick/5k.pdf assets/stick/10k.pdf
+doc/$(PACKAGE)-example.pdf: doc/$(PACKAGE)-example.tex $(PACKAGE).sty tiles/$(PACKAGE)-1m.pdf $(STICK_ASSETS)
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error -output-directory=doc doc/$(PACKAGE)-example.tex
 
 code-doc: doc/$(PACKAGE).pdf

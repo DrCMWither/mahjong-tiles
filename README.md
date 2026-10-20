@@ -17,7 +17,7 @@ Then install these files together in a TeX-searchable package directory, or keep
 ```text
 mahjong-tiles.sty
 tiles/*.pdf
-assets/stick/*.pdf
+assets/stick/mahjong-tiles-*.pdf
 ```
 
 The default artwork paths are `tiles/` for tile faces and backs, and `assets/stick/` for score sticks.  If you install the artwork elsewhere, set `tile-dir` or `stick-dir` accordingly.
